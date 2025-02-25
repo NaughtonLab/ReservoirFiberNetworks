@@ -62,3 +62,7 @@ This unit conversion is reflected in the comments of `fiber_simulation.py` and `
 - **Video Visualization**: A `.mp4` video of the simulation (if enabled).
 - **Pickle Data**: Saves simulation results in a `.pickle` file for further analysis.
 
+## Contribution
+
+- This respository is developed by the Biomechanical Systems Lab at the Department of Mechanical Engineering, Virgnia Tech.
+- **Key contributors**: Apoorva Khairnar, Johannes Rummelein, Noel Naughton (*in alphabetical order*)
