@@ -1,0 +1,16 @@
+__pycache__/fiber_simulation.cpython-310.pyc
+utils/__pycache__/networkcallback.cpython-310.pyc
+utils/forces/__pycache__/pointforce.cpython-310.pyc
+utils/forces/__pycache__/pointforce.PointForce.compute_end_point_forces-55.py310.1.nbc
+utils/forces/__pycache__/pointforce.PointForce.compute_end_point_forces-55.py310.nbi
+utils/forces/__pycache__/pointforce.PointForceSinsusoidal.compute_end_point_forces-141.py310.1.nbc
+utils/forces/__pycache__/pointforce.PointForceSinsusoidal.compute_end_point_forces-141.py310.nbi
+utils/forces/__pycache__/pointforce.PointForceSpline.compute_end_point_forces-231.py310.1.nbc
+utils/forces/__pycache__/pointforce.PointForceSpline.compute_end_point_forces-231.py310.2.nbc
+utils/forces/__pycache__/pointforce.PointForceSpline.compute_end_point_forces-231.py310.nbi
+utils/render/__pycache__/post_processing.cpython-310.pyc
+FiberSim_1rods_5sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02constant_k1e+09_kt1e+09_fps250.mp4
+FiberSim_1rods_5sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02sinusoidal_k1e+09_kt1e+09_fps250.mp4
+FiberSim_1rods_5sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02spline_k1e+09_kt1e+09_fps250.mp4
+FiberSim_4rods_10sec_L1.00e+03_R2.50e+01_dx20_YM2.30e+08_Damping10_TF1e+04_PF-2e+05_k1e+09_kt1e+09_fps250.mp4
+fiber_simulation_backup.py
