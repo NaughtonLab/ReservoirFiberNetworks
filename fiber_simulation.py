@@ -344,26 +344,3 @@ class fiber_simulation():
                 print("Video saved!! Pickle file deleted!!")
         else:
             print("Stopped at NaN. Data not saved!")
-
-# def wrapper_launcher(params):
-#     try:
-#         sim = fiber_simulation(**params)
-#         sim.launch_sim()
-#     except Exception as e:
-#         print(f'Something failed! {params}, Error: {e}')
-#     return
-
-# def mp_handler(params_list):
-#     p = multiprocessing.Pool(1)
-#     p.map(wrapper_launcher, params_list)
-
-# if __name__ == '__main__':
-#     with open('config_mm_g_s.json', 'r') as f:
-#         config = json.load(f)
-    
-#     params = config['params']
-#     params_list = [params]
-#     # print(params)
-
-#     ''' Launching the simulation'''
-#     # mp_handler(params_list)
