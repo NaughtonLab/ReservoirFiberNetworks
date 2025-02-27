@@ -42,11 +42,13 @@ pip install pyelastica numpy matplotlib scipy tqdm
 
 - `network_callback.py`: Implements PyElastica's callback functionality to store and retrieve simulation data.
 
+- `unit_scaling.py`: Provides funcitonality to scale quantities in SI units to non-SI units.
+
 ## Unit Scaling
 
 The simulation uses a non-SI unit system for better numerical stability. Below is the scaling of SI units to the custom units used in the repository:
 
-| **Quantity** | **SI Units** | **Scaling 1** | **Scaling 2**  |
+| **Quantity** | **SI Units** | **Scaling 1** (mm, g, s) | **Scaling 2** (mm, mg, ms) |
 | ------------ | ------------ | ---------------------- | ----------------------- |
 | Length       | m            | \(10^3\) mm            | \(10^2\) mm             |
 | Mass         | kg           | \(10^3\) g             | \(10^6\) mg             |

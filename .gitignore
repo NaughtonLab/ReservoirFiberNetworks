@@ -14,3 +14,6 @@ FiberSim_1rods_5sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping1
 FiberSim_1rods_5sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02spline_k1e+09_kt1e+09_fps250.mp4
 FiberSim_4rods_10sec_L1.00e+03_R2.50e+01_dx20_YM2.30e+08_Damping10_TF1e+04_PF-2e+05_k1e+09_kt1e+09_fps250.mp4
 fiber_simulation_backup.py
+__pycache__/unit_scaling.cpython-310.pyc
+config_mm_g_s.json
+config_mm_mg_ms.json

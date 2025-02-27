@@ -5,6 +5,7 @@ import json
 import numpy as np
 
 from fiber_simulation import fiber_simulation
+from utils.unit_scaling import unit_scaling
 
 def wrapper_launcher(params):
     try:
@@ -24,28 +25,28 @@ if __name__ == '__main__':
         'num_vertical_threads': 0,
         'network_origin': np.zeros((3,)), # network_origin is the center of the network
 
-        'thread_length': 500, # mm
-        'thread_diameter': 0.45, # mm
-        'dx': 10, # mm
+        'thread_length': 50e-2, # 1 m --> 1e3 mm
+        'thread_diameter': 0.45e-3, # 1 m --> 1e3 mm
+        'dx': 10e-3, # 1 m --> 1e3 mm
 
-        'youngs_modulus': 5e6, # Pa = kg / m / s2
-        'density': 1e3 * 1e-6, # kg / mm3
+        'youngs_modulus': 5e6, # 1 Pa = kg /m/s2 --> 1 g/mm/s2 --> 1e-3 mg/mm/ms2
+        'density': 1e3, # 1 kg / mm3 --> 1e-6 g/mm3 --> 1e-3 mg/mm3
 
-        'tension_force': 1e4, # uN
-        'point_force_mag': -5e2, # uN
+        'tension_force': 1e-2, # 1 N = kg m/s2 --> 1e6 g mm/s2 --> 1e3 mg mm /ms2  
+        'point_force_mag': -5e-4, # 1 N = kg m/s2 --> 1e6 g mm/s2 --> 1e3 mg mm /ms2 
         'SPREAD_PF': False, # whether the force should be a gaussian spread across 5 nodes or just applied at a single point
         'TYPE_PF': "sinusoidal", # type of force to be applied 
         'sample_freq_pf': 5, # Sampling frequency for random point force
 
-        'damping_constant': 10, # 
+        'damping_constant': 10, 
         'filter_order': 6,
 
         'k': 1e9, # translational stiffness of connection
         'kt': 1e9, # rotational stiffness of connection
         'nu': 0.0, # translational damping of connection
 
-        'duration': 5, # s
-        'sim_dt': 5e-6, # simulation timestep
+        'duration': 5, # 1 s --> 1e3 ms
+        'sim_dt': 5e-5, # simulation timestep
 
         'rendering_fps': 250,
         
@@ -53,6 +54,8 @@ if __name__ == '__main__':
         'CALLBACK': True,
         'VIDEO': True
     }
+
+    params = unit_scaling.scale(params=params, scaling_type="mm_mg_ms")
 
     params_list = [params]
 
