@@ -17,3 +17,4 @@ fiber_simulation_backup.py
 __pycache__/unit_scaling.cpython-310.pyc
 config_mm_g_s.json
 config_mm_mg_ms.json
+utils/__pycache__/unit_scaling.cpython-310.pyc
