@@ -2,7 +2,7 @@
 
 This repository provides a simulation framework for modeling fiber networks made up of soft, flexible rods or threads. It uses PyElastica to model these fibers as Cosserat rods and allows users to configure and simulate networks of fibers with various physical properties and external forces. The following image depicts an example network of 2 horizontal and 2 vertical rods. These rods are connected to each other using virtual spring-damper systems and they are subjected to tensile forces at the ends. A stimulating force is being applied to one of these rods in order to observe the dynamics and perform further computations using this system.
 
-![1.0](images/example.jpg)
+![0.5](images/example.jpg)
 
 - **Customizable Parameters**: Size of the network, Length, diameter, density and Young's modulus of the rods, tension force applied at the ends, magnitude and type of the stimulating force (point force), spread of the point force, properties of the connections, and duration of the simulation.
 - **Different Force Types**: Supports constant, sinusoidal, and spline-based forces which can be applied at a single node or spread across multiple neighboring nodes.
@@ -64,3 +64,7 @@ This unit conversion is reflected in the comments of `fiber_simulation.py` and `
 - **Video Visualization**: A `.mp4` video of the simulation (if enabled).
 - **Pickle Data**: Saves simulation results in a `.pickle` file for further analysis.
 
+## Contribution
+
+- This respository is developed by the Biomechanical Systems Lab at the Department of Mechanical Engineering, Virgnia Tech.
+- **Key contributors**: Apoorva Khairnar, Johannes Rummelein, Noel Naughton (*in alphabetical order*)
