@@ -3,6 +3,7 @@ import pickle
 import multiprocessing
 import json
 import numpy as np
+import pandas as pd
 from scipy.interpolate import CubicSpline
 import matplotlib.pyplot as plt
 from collections import defaultdict
@@ -255,29 +256,30 @@ class fiber_simulation():
         stencil = 1/(np.abs(point_force_spread)+1)
         stencil /= np.sum(stencil)
 
-        match self.TYPE_PF:
-            case "constant":
-                for i in point_force_spread:
-                    self.simulator.add_forcing_to(self.horizontal_thread[-1]).using(
-                        PointForce, node_idx=node_idx+i, point_force=point_force*stencil[i],
-                        ramp_up_time=0.25, hold_time=5.0)
-            case "sinusoidal":
-                for i in point_force_spread:
-                    self.simulator.add_forcing_to(self.horizontal_thread[-1]).using(
-                        PointForceSinsusoidal, node_idx=node_idx+i, point_force=point_force*stencil[i],
-                        ramp_up_time=0.25, hold_time=5.0)
-            case "spline":
-                sample_time = np.ceil(self.duration).astype(int)
-                y_sample = np.random.uniform(-1,1, size=sample_time*self.sample_freq+1)
-                y_sample[0] = 0.0
+        if self.TYPE_PF=="constant":
+            for i in point_force_spread:
+                self.simulator.add_forcing_to(self.horizontal_thread[-1]).using(
+                    PointForce, node_idx=node_idx+i, point_force=point_force*stencil[i],
+                    ramp_up_time=0.25, hold_time=5.0)
+        elif self.TYPE_PF=="sinusoidal":
+            for i in point_force_spread:
+                self.simulator.add_forcing_to(self.horizontal_thread[-1]).using(
+                    PointForceSinsusoidal, node_idx=node_idx+i, point_force=point_force*stencil[i],
+                    ramp_up_time=0.25, hold_time=5.0)
+        elif self.TYPE_PF=="spline":
+            sample_time = np.ceil(self.duration).astype(int)
+            y_sample = np.random.uniform(-1,1, size=sample_time*self.sample_freq+1)
+            y_sample[0] = 0.0
 
-                x_sample = np.linspace(0, sample_time, sample_time*self.sample_freq + 1)
-                spline = CubicSpline(x_sample, y_sample)
+            x_sample = np.linspace(0, sample_time, sample_time*self.sample_freq + 1)
+            spline = CubicSpline(x_sample, y_sample)
 
-                for i in point_force_spread:
-                    self.simulator.add_forcing_to(self.horizontal_thread[-1]).using(
-                        PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i],
-                        ramp_up_time=1.0, spline=spline)
+            for i in point_force_spread:
+                self.simulator.add_forcing_to(self.horizontal_thread[-1]).using(
+                    PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i],
+                    ramp_up_time=1.0, spline=spline)
+        else:
+            print("Invalid type of point force!!")
             
         self.simulator.finalize()
 
@@ -311,20 +313,26 @@ class fiber_simulation():
         if not stopped_at_nan:
             rods_history = self.post_processing_dict_horizontal_thread + self.post_processing_dict_vertical_thread
             time = np.array(rods_history[0]["time"])
-            match self.TYPE_PF:
-                case "constant":
-                    force_profile = np.full_like(time, self.point_force_mag)
-                case "sinusoidal":
-                    force_profile = np.sin(time*(2 * np.pi)/0.3)*np.sin(time*(2 * np.pi)/1.0)*self.point_force_mag
-                case "spline":
-                    force_profile = spline(time)*self.point_force_mag
+            if self.TYPE_PF=="constant":
+                force_profile = np.full_like(time, self.point_force_mag)
+            elif self.TYPE_PF=="sinusoidal":
+                force_profile = np.sin(time*(2 * np.pi)/0.3)*np.sin(time*(2 * np.pi)/1.0)*self.point_force_mag
+            elif self.TYPE_PF=="spline":
+                force_profile = spline(time)*self.point_force_mag
+            else:
+                print("Invalid type of point force!!")
 
             data = ([rods_history] + [force_profile])
             
             with open(f'{name}.pickle', 'wb') as handle:
                 pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-            print("Data saved!!")
+            print("Data saved as Pickle!!")
+
+            df = rods_history[0]
+            df = pd.DataFrame(df)
+            df.to_csv(f'{name}.csv', index=False)
+            print("Data saved as CSV!!")
 
             if self.VIDEO:
                 x_limits = [-self.thread_length/2-5, self.thread_length/2+5]

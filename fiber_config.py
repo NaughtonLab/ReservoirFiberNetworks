@@ -34,8 +34,8 @@ if __name__ == '__main__':
 
         'tension_force': 1e-2, # 1 N = kg m/s2 --> 1e6 g mm/s2 --> 1e3 mg mm /ms2  
         'point_force_mag': -5e-4, # 1 N = kg m/s2 --> 1e6 g mm/s2 --> 1e3 mg mm /ms2 
-        'SPREAD_PF': False, # whether the force should be a gaussian spread across 5 nodes or just applied at a single point
-        'TYPE_PF': "sinusoidal", # type of force to be applied 
+        'SPREAD_PF': True, # whether the force should be a gaussian spread across 5 nodes or just applied at a single point
+        'TYPE_PF': "spline", # type of force to be applied 
         'sample_freq_pf': 5, # Sampling frequency for random point force
 
         'damping_constant': 10, 
@@ -45,8 +45,8 @@ if __name__ == '__main__':
         'kt': 1e9, # rotational stiffness of connection
         'nu': 0.0, # translational damping of connection
 
-        'duration': 5, # 1 s --> 1e3 ms
-        'sim_dt': 5e-5, # simulation timestep
+        'duration': 6, # 1 s --> 1e3 ms
+        'sim_dt': 5e-6, # simulation timestep
 
         'rendering_fps': 250,
         
@@ -55,7 +55,7 @@ if __name__ == '__main__':
         'VIDEO': True
     }
 
-    params = unit_scaling.scale(params=params, scaling_type="mm_mg_ms")
+    params = unit_scaling.scale(params=params, scaling_type="mm_g_s")
 
     params_list = [params]
 
