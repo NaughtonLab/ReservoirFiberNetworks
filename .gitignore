@@ -18,3 +18,9 @@ __pycache__/unit_scaling.cpython-310.pyc
 config_mm_g_s.json
 config_mm_mg_ms.json
 utils/__pycache__/unit_scaling.cpython-310.pyc
+ARCFiberSim_1rods_5sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02sinusoidal_k1e+09_kt1e+09_fps250.mp4
+ARCFiberSim_1rods_5000sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+03_Density1.00e+00_Damping10_TF1e+01_PF-5e-01sinusoidal_k1e+09_kt1e+09_fps250.pickle
+FiberSim_1rods_6sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02spline_k1e+09_kt1e+09_fps250.csv
+FiberSim_1rods_6sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02spline_k1e+09_kt1e+09_fps250.mp4
+FiberSim_1rods_6sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02spline_k1e+09_kt1e+09_fps250.pickle
+FiberSim_1rods_5000sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+03_Density1.00e+00_Damping10_TF1e+01_PF-5e-01spline_k1e+09_kt1e+09_fps250.pickle
