@@ -59,6 +59,7 @@ class fiber_simulation():
         '''Magnitude and type of external point force'''
         self.point_force_mag = kwargs.get("point_force_mag", -2e5)
         self.SPREAD_PF = kwargs.get("SPREAD_PF", False)
+        self.spread = kwargs.get("spread", 2)
         self.TYPE_PF = kwargs.get("TYPE_PF", "constant")
 
         """CONNECTION PARAMETERS"""
@@ -90,6 +91,9 @@ class fiber_simulation():
         self.CALLBACK = kwargs.get("CALLBACK", True)
         self.VIDEO = kwargs.get("VIDEO", True)
 
+        self.scaling_type = kwargs.get('scaling_type', "mm_g_s")
+        self.loc = kwargs.get('loc', './')
+        self.file_type = kwargs.get('file_type', 'pickle')
 
     def add_threads(self):
         """HORIZONTAL THREADS"""
@@ -124,7 +128,7 @@ class fiber_simulation():
                 time_step = self.sim_dt
             )
 
-            self.simulator.dampen(self.horizontal_thread[i]).using(LaplaceDissipationFilter, filter_order = self.filter_order)
+            # self.simulator.dampen(self.horizontal_thread[i]).using(LaplaceDissipationFilter, filter_order = self.filter_order)
 
             self.simulator.constrain(self.horizontal_thread[i]).using(
                 GeneralConstraint, 
@@ -177,7 +181,7 @@ class fiber_simulation():
                 time_step = self.sim_dt
             )
 
-            self.simulator.dampen(self.vertical_thread[i]).using(LaplaceDissipationFilter, filter_order = self.filter_order)
+            # self.simulator.dampen(self.vertical_thread[i]).using(LaplaceDissipationFilter, filter_order = self.filter_order)
 
             self.simulator.constrain(self.vertical_thread[i]).using(
                 GeneralConstraint, 
@@ -237,47 +241,107 @@ class fiber_simulation():
 
                 self.post_processing_dict_vertical_thread.append(post_processing_dict_vertical_thread_each)
 
+    def get_node_idx(self):
+        if self.num_horizontal_threads == 1 and self.num_vertical_threads == 0:
+            vib_thread_idx_list = np.array([0])
+            node_idx_list = np.array([self.n_elem//2])
+        elif self.num_horizontal_threads == 1 and self.num_vertical_threads == 1:
+            vib_thread_idx_list = np.array([0])
+            node_idx_list = np.array([self.n_elem//4])
+        else:
+            # Number of threads to be stimulated
+            num_vib_threads = np.floor(self.num_horizontal_threads*0.75).astype(int)
+
+            # Randomly select the threads to be stimulated
+            vib_thread_idx_list = np.random.choice(self.num_horizontal_threads, num_vib_threads, replace=False) # replace=True will enable repeated selection
+
+            # Randomly select the nodes to be stimulated
+            valid_nodes = [i for i in range(self.n_elem+1) if all(abs(i-idx) >= self.spread for idx in self.hor_connect_idx) and min(self.hor_connect_idx) <= i <= max(self.hor_connect_idx)]
+            node_idx_list = np.random.choice(valid_nodes, num_vib_threads, replace=True)
+
+        return vib_thread_idx_list, node_idx_list
+    
+    def save_data(self, data, name):
+        if self.file_type == "pickle":
+            with open(f'{self.loc}{name}.pickle', 'wb') as handle:
+                pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            print("Data saved as Pickle!!")
+        elif self.file_type == "npz":
+            rods_history, force_profile = data
+            np.savez(f'{self.loc}{name}.npz', rods_history=rods_history, force_profile=force_profile)
+            print("Data saved as NPZ!!")
+        else:
+            print("Invalid file type!!")
+
     def launch_sim(self):
 
-        suffix = f'{self.duration:.0f}sec_L{self.thread_length:.2e}_R{self.thread_radius:.2e}_dx{self.dx:.0f}_YM{self.youngs_modulus:.2e}_Density{self.density:.2e}_Damping{self.damping_constant:.0f}_TF{self.tension_force:.0e}_PF{self.point_force_mag:.0e}{self.TYPE_PF}_k{self.k:.0e}_kt{self.kt:.0e}_fps{self.rendering_fps}'
-        name = f"FiberSim_{self.num_horizontal_threads+self.num_vertical_threads}rods_{suffix}" #_multiplevib"
+        if self.scaling_type == "mm_g_s":
+            time_scale = 1
+            length_scale = 1e3
+            mass_scale = 1e3
+            force_scale = 1e6
+            density_scale = 1e-6
+            modulus_scale = 1
+        elif self.scaling_type == "mm_mg_ms":
+            time_scale = 1e3
+            length_scale = 1e3
+            mass_scale = 1e6
+            force_scale = 1e3
+            density_scale = 1e-3
+            modulus_scale = 1e-3
+        else:
+            raise NotImplementedError ("This unitscaling has not been implemented")
+
+        suffix = f'{self.duration/time_scale:.0f}sec_L{self.thread_length/length_scale:.2e}m_R{self.thread_radius/length_scale:.2e}m_dx{self.dx:.0f}mm_YM{self.youngs_modulus/modulus_scale:.2e}Pa_Density{self.density/density_scale:.2e}kgmm-3_Damping{self.damping_constant:.0f}_TF{self.tension_force/force_scale:.0e}N_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_k{self.k:.0e}_kt{self.kt:.0e}_fps{self.rendering_fps}_stepskip{self.step_skip}'
+        name = f"{self.scaling_type}_FiberSim_{self.num_horizontal_threads+self.num_vertical_threads}rods_{suffix}"
         print(name)
 
         self.add_threads()
 
-        point_force = np.array([0.0, self.point_force_mag, 0.0])   # N -> kg m/s2 --> 1e3 g 1e3 mm / s2 (1e6)
-        node_idx = np.rint(self.n_elem/2.).astype(int)
+        point_force = np.array([0.0, self.point_force_mag, 0.0])   # N -> kg m/s2 --> 1e3 g 1e3 mm / s2 (1e6) --> 1e6 mg 1e3 mm / 1e6 ms2 (1e3)
 
         if self.SPREAD_PF:
-            point_force_spread = np.arange(-2, 3)
+            point_force_spread = np.arange(-self.spread, self.spread+1)
         else:
             point_force_spread = np.arange(0, 1)
 
         stencil = 1/(np.abs(point_force_spread)+1)
         stencil /= np.sum(stencil)
 
+        vib_thread_idx_list, node_idx_list = self.get_node_idx()
+
         if self.TYPE_PF=="constant":
-            for i in point_force_spread:
-                self.simulator.add_forcing_to(self.horizontal_thread[-1]).using(
-                    PointForce, node_idx=node_idx+i, point_force=point_force*stencil[i],
-                    ramp_up_time=0.25, hold_time=5.0)
+            for j in range(len(vib_thread_idx_list)):
+                node_idx = node_idx_list[j]
+                vib_thread = self.horizontal_thread[j]
+                for i in point_force_spread:
+                    self.simulator.add_forcing_to(vib_thread).using(
+                        PointForce, node_idx=node_idx+i, point_force=point_force*stencil[i],
+                        ramp_up_time=0.25, hold_time=5.0)
         elif self.TYPE_PF=="sinusoidal":
-            for i in point_force_spread:
-                self.simulator.add_forcing_to(self.horizontal_thread[-1]).using(
-                    PointForceSinsusoidal, node_idx=node_idx+i, point_force=point_force*stencil[i],
-                    ramp_up_time=0.25, hold_time=5.0)
+            for j in range(len(vib_thread_idx_list)):
+                node_idx = node_idx_list[j]
+                vib_thread = self.horizontal_thread[j]
+                for i in point_force_spread:
+                    self.simulator.add_forcing_to(vib_thread).using(
+                        PointForceSinsusoidal, node_idx=node_idx+i, point_force=point_force*stencil[i],
+                        ramp_up_time=0.25, hold_time=5.0)
         elif self.TYPE_PF=="spline":
             sample_time = np.ceil(self.duration).astype(int)
-            y_sample = np.random.uniform(-1,1, size=sample_time*self.sample_freq+1)
-            y_sample[0] = 0.0
 
             x_sample = np.linspace(0, sample_time, sample_time*self.sample_freq + 1)
-            spline = CubicSpline(x_sample, y_sample)
+            for j in range(len(vib_thread_idx_list)):
+                y_sample = np.random.uniform(-1,1, size=sample_time*self.sample_freq+1)
+                y_sample[0] = 0.0    
+                spline = CubicSpline(x_sample, y_sample)
 
-            for i in point_force_spread:
-                self.simulator.add_forcing_to(self.horizontal_thread[-1]).using(
-                    PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i],
-                    ramp_up_time=1.0, spline=spline)
+                node_idx = node_idx_list[j]
+                vib_thread = self.horizontal_thread[j]
+
+                for i in point_force_spread:
+                    self.simulator.add_forcing_to(vib_thread).using(
+                        PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i],
+                        ramp_up_time=1.0, spline=spline)
         else:
             print("Invalid type of point force!!")
             
@@ -324,23 +388,16 @@ class fiber_simulation():
 
             data = ([rods_history] + [force_profile])
             
-            with open(f'{name}.pickle', 'wb') as handle:
-                pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-            print("Data saved as Pickle!!")
-
-            df = rods_history[0]
-            df = pd.DataFrame(df)
-            df.to_csv(f'{name}.csv', index=False)
-            print("Data saved as CSV!!")
+            if self.CALLBACK:
+                self.save_data(data, name)
 
             if self.VIDEO:
                 x_limits = [-self.thread_length/2-5, self.thread_length/2+5]
                 y_limits = [-self.thread_length/2-5, self.thread_length/2+5]
-                params_str =  f"Young's Modulus = {self.youngs_modulus:.2e}, Point Force = {self.point_force_mag:.0e}, Tension Force = {self.tension_force:.0e}"
+                params_str =  f"Young's Modulus = {self.youngs_modulus/modulus_scale:.2e}Pa, Point Force = {self.point_force_mag/force_scale:.0e}N, Tension Force = {self.tension_force/force_scale:.0e}N"
                 plot_network_video_2D(
                     rods_history,
-                    video_name=f"{name}.mp4",
+                    video_name=f"{self.loc}{name}.mp4",
                     fps=self.rendering_fps,
                     step=1,
                     vis2D=False,
@@ -348,7 +405,7 @@ class fiber_simulation():
                     y_limits=y_limits,
                     params_str=params_str
                 )
-                os.remove(f'{name}.pickle')
+                # os.remove(f'{name}.{self.file_type}')
                 print("Video saved!! Pickle file deleted!!")
         else:
             print("Stopped at NaN. Data not saved!")

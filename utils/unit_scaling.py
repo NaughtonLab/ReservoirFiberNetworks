@@ -26,6 +26,8 @@ class unit_scaling:
 
             params['tension_force'] *= 1e3
             params['point_force_mag'] *= 1e3
+            params['sample_freq_pf'] *= 1e-3
+            params['sample_freq_pf'] = np.rint(params['sample_freq_pf']).astype(int)
 
             params['duration'] *= 1e3
         else:
