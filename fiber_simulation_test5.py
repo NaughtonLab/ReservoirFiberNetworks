@@ -136,16 +136,16 @@ class fiber_simulation():
                 GeneralConstraint, 
                 constrained_position_idx=(0, ), 
                 constrained_director_idx=(0, ), 
-                translational_constraint_selector=np.array([True, True, True]),
-                rotational_constraint_selector=np.array([True, True, False]),
+                translational_constraint_selector=np.array([True, True, False]),
+                rotational_constraint_selector=np.array([False, False, False]),
             )
 
             self.simulator.constrain(self.horizontal_thread[i]).using(
                 GeneralConstraint, 
                 constrained_position_idx=(-1, ), 
                 constrained_director_idx=(-1, ), 
-                translational_constraint_selector=np.array([False, True, True]),
-                rotational_constraint_selector=np.array([True, True, False]),
+                translational_constraint_selector=np.array([False, True, False]),
+                rotational_constraint_selector=np.array([False, False, False]),
             )
 
             self.simulator.add_forcing_to(self.horizontal_thread[i]).using(
@@ -189,16 +189,16 @@ class fiber_simulation():
                 GeneralConstraint, 
                 constrained_position_idx=(0, ), 
                 constrained_director_idx=(0, ),
-                translational_constraint_selector=np.array([True, True, True]), 
-                rotational_constraint_selector=np.array([True, True, False])
+                translational_constraint_selector=np.array([True, True, False]), 
+                rotational_constraint_selector=np.array([False, False, False])
             )
 
             self.simulator.constrain(self.vertical_thread[i]).using(
                 GeneralConstraint, 
                 constrained_position_idx=(-1, ), 
                 constrained_director_idx=(-1, ),
-                translational_constraint_selector=np.array([True, False, True]), 
-                rotational_constraint_selector=np.array([True, True, False])
+                translational_constraint_selector=np.array([True, False, False]), 
+                rotational_constraint_selector=np.array([False, False, False])
             )
 
             self.simulator.add_forcing_to(self.vertical_thread[i]).using(
@@ -216,7 +216,7 @@ class fiber_simulation():
                             k = self.k,
                             nu = self.nu,
                             kt = self.kt,
-                            rest_rotation_matrix = rest_rotation_matrix
+                            # rest_rotation_matrix = rest_rotation_matrix
                             )
 
         """INITIALIZING CALLBACK"""
@@ -302,12 +302,12 @@ class fiber_simulation():
 
         suffix = f'L{self.thread_length/length_scale:.2e}m_R{self.thread_radius/length_scale:.2e}m_dx{self.dx:.0f}mm_YM{self.youngs_modulus/modulus_scale:.2e}Pa_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_fps{self.rendering_fps}_stepskip{self.step_skip}'
         # name = f"{self.scaling_type}_FiberSim_{self.num_horizontal_threads+self.num_vertical_threads}rods_{suffix}"
-        name = f"test0_{self.num_horizontal_threads}by{self.num_vertical_threads}rods_{suffix}"
+        name = f"test5_{self.num_horizontal_threads}by{self.num_vertical_threads}rods_{suffix}"
         print(name)
 
         self.add_threads()
 
-        point_force = np.array([0.0, self.point_force_mag, 0.0])   # N -> kg m/s2 --> 1e3 g 1e3 mm / s2 (1e6) --> 1e6 mg 1e3 mm / 1e6 ms2 (1e-3)
+        point_force = np.array([0.0, 0.0, self.point_force_mag])   # N -> kg m/s2 --> 1e3 g 1e3 mm / s2 (1e6) --> 1e6 mg 1e3 mm / 1e6 ms2 (1e-3)
 
         if self.SPREAD_PF:
             point_force_spread = np.arange(-self.spread, self.spread+1)
@@ -364,6 +364,41 @@ class fiber_simulation():
                         ramp_up_time=ramp_up_time, spline=spline)
                     
                 spline_list.append(spline)
+        elif self.TYPE_PF=="out_of_plane":
+            ramp_up_time = 1.0 * time_scale
+            seed_value = 42 #int(time.time()) % (2**32-1)
+            np.random.seed(seed_value)
+
+            sample_time = np.ceil(self.duration).astype(int)
+            x_sample = np.linspace(0, sample_time, sample_time*self.sample_freq + 1)
+
+            spline_list = []
+
+            y_sample = np.random.uniform(-1,1, size=sample_time*self.sample_freq+1)
+            y_sample[0] = 0.0    
+            spline = CubicSpline(x_sample, y_sample)
+
+            for j in range(len(vib_thread_idx_list)):
+                node_idx = node_idx_list[j]
+                vib_thread_idx = vib_thread_idx_list[j]
+                vib_thread = self.horizontal_thread[vib_thread_idx]
+
+                for i in point_force_spread:
+                    self.simulator.add_forcing_to(vib_thread).using(
+                        PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i],
+                        ramp_up_time=ramp_up_time, spline=spline)
+                    
+            # for j in range(len(vib_thread_idx_list)):
+            #     node_idx = node_idx_list[j]
+            #     vib_thread_idx = vib_thread_idx_list[j]
+            #     vib_thread = self.vertical_thread[vib_thread_idx]
+
+            #     for i in point_force_spread:
+            #         self.simulator.add_forcing_to(vib_thread).using(
+            #             PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i],
+            #             ramp_up_time=ramp_up_time, spline=spline)
+                    
+            spline_list.append(spline)
         else:
             raise NotImplementedError ("Invalid type of point force!!")
             
@@ -395,6 +430,8 @@ class fiber_simulation():
                     break
                 else:
                     stopped_at_nan = False
+            else:
+                stopped_at_nan = False
 
         if not stopped_at_nan:
             rods_history = self.post_processing_dict_horizontal_thread + self.post_processing_dict_vertical_thread
@@ -405,6 +442,9 @@ class fiber_simulation():
                 force_profile = np.sin(time_array*(2 * np.pi)/0.3)*np.sin(time_array*(2 * np.pi)/1.0)*self.point_force_mag
             elif self.TYPE_PF=="spline":
                 force_profile = [spline_i(time_array)*self.point_force_mag for spline_i in spline_list]
+            elif self.TYPE_PF=="varying_sine":
+                force_profile = [np.sin(2*np.pi*spline_i(time_array)*time_array)*self.point_force_mag for spline_i in spline_list]
+                print(len(force_profile))
             else:
                 print("Invalid type of point force!!")
 
