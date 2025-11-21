@@ -67,4 +67,4 @@ This unit conversion is reflected in the comments of `fiber_simulation.py` and `
 ## Contribution
 
 - This respository is developed by the Biomechanical Systems Lab at the Department of Mechanical Engineering, Virgnia Tech.
-- **Key contributors**: Apoorva Khairnar, Johannes Rummelein, Noel Naughton (*in alphabetical order*)
+- **Key contributors**: Apoorva Khairnar, Noel Naughton (*in alphabetical order*)
