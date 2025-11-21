@@ -4,7 +4,8 @@ class unit_scaling:
 
     def scale(params, scaling_type):
         if scaling_type=="mm_g_s":
-            params['thread_length'] *=  1e3
+            key = 'thread_length' if 'thread_length' in params else 'polygon_diameter'
+            params[key] *= 1e3
             params['thread_diameter'] *=  1e3
             params['dx'] *= 1e3
             
@@ -17,7 +18,8 @@ class unit_scaling:
             params['duration'] *= 1
 
         elif scaling_type=="mm_mg_ms":
-            params['thread_length'] *=  1e3
+            key = 'thread_length' if 'thread_length' in params else 'polygon_diameter'
+            params[key] *=  1e3
             params['thread_diameter'] *=  1e3
             params['dx'] *= 1e3
             
