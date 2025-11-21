@@ -245,3 +245,97 @@ Simulations/OldSimFiles/gym_fiber/utils/custom_elastica/muscle_torque/__pycache_
 Simulations/OldSimFiles/gym_fiber/utils/custom_elastica/muscle_torque/__pycache__/muscle_torques_with_bspline.MuscleTorquesWithVaryingBetaSplines.compute_muscle_torques-210.py38.nbi
 Simulations/OldSimFiles/gym_fiber/utils/custom_elastica/muscle_torque/__pycache__/muscle_torques_with_bspline.MuscleTorquesWithVaryingBetaSplines.compute_muscle_torques-213.py38.1.nbc
 Simulations/OldSimFiles/gym_fiber/utils/custom_elastica/muscle_torque/__pycache__/muscle_torques_with_bspline.MuscleTorquesWithVaryingBetaSplines.compute_muscle_torques-213.py38.nbi
+SMASIS_constant_force/legendre_evaluation_network_density_comparison_force_all_changedylim.pdf
+SMASIS_constant_force/legendre_evaluation_network_density_comparison_YM100MPa.pdf
+SMASIS_constant_force/memory_evaluation_network_density_comparison_force_all_changedylim.pdf
+SMASIS_constant_force/memory_evaluation_network_density_comparison_YM100MPa.pdf
+Simulations/old_spider_web/SpiderWebNoGym.py
+Simulations/old_spider_web/SpiderWebNoGymBoundary.py
+Simulations/old_spider_web/SpiderWebNoGymRadial.py
+Simulations/SineWithRandomOmega/varying_sine_4rods.npz
+Simulations/SineWithRandomOmega/varying_sine_data_issuediffconstraints_mm_g_s_FiberSim_4rods_0sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.npz
+Simulations/SineWithRandomOmega/varying_sine_data_issuediffconstraints_mm_g_s_FiberSim_4rods_1sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.npz
+Simulations/SineWithRandomOmega/varying_sine_legendre.png
+Simulations/SineWithRandomOmega/varying_sine_memory.png
+Simulations/SineWithRandomOmega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_1sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.mp4
+Simulations/SineWithRandomOmega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_1sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.npz
+Simulations/SineWithRandomOmega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_10sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.mp4
+Simulations/SineWithRandomOmega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_10sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.npz
+Simulations/Test 0 to 2 10 sec/test0_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.mp4
+Simulations/Test 0 to 2 10 sec/test0_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.npz
+Simulations/Test 0 to 2 10 sec/test0_legendre_eval.png
+Simulations/Test 0 to 2 10 sec/test0_memory_eval.png
+Simulations/Test 0 to 2 10 sec/test0.npz
+Simulations/Test 0 to 2 10 sec/test1_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.mp4
+Simulations/Test 0 to 2 10 sec/test1_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.npz
+Simulations/Test 0 to 2 10 sec/test1_legendre_eval.png
+Simulations/Test 0 to 2 10 sec/test1_memory_eval.png
+Simulations/Test 0 to 2 10 sec/test1.npz
+Simulations/Test 0 to 2 10 sec/test2_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.mp4
+Simulations/Test 0 to 2 10 sec/test2_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.npz
+Simulations/Test 0 to 2 10 sec/test2_legendre_eval.png
+Simulations/Test 0 to 2 10 sec/test2_memory_eval.png
+Simulations/Test 0 to 2 10 sec/test2.npz
+Simulations/OldSimFiles/_rotations.py
+Simulations/OldSimFiles/4rods_original.mp4
+Simulations/OldSimFiles/4rods_original.pickle
+Simulations/OldSimFiles/analysis.ipynb
+Simulations/OldSimFiles/FiberNoGym_3.py
+Simulations/OldSimFiles/FiberNoGym_4.py
+Simulations/OldSimFiles/FiberNoGym_newunits.py
+Simulations/OldSimFiles/force_profile.ipynb
+Simulations/OldSimFiles/force_profile.png
+Simulations/OldSimFiles/pointforce.py
+Simulations/OldSimFiles/post_processing_rod_data_1.py
+Simulations/OldSimFiles/post_processing_rod_data_2.py
+Simulations/OldSimFiles/post_processing_rod_data_3.py
+Simulations/OldSimFiles/post_processing_rod_data_4.py
+Simulations/OldSimFiles/setup.py
+Simulations/OldSimFiles/gym_fiber/__init__.py
+Simulations/OldSimFiles/gym_fiber/config.py
+Simulations/OldSimFiles/gym_fiber/envs/__init__.py
+Simulations/OldSimFiles/gym_fiber/envs/build.py
+Simulations/OldSimFiles/gym_fiber/envs/fiber.py
+Simulations/OldSimFiles/gym_fiber/utils/__init__.py
+Simulations/OldSimFiles/gym_fiber/utils/intersection.py
+Simulations/OldSimFiles/gym_fiber/utils/linalg.py
+Simulations/OldSimFiles/gym_fiber/utils/web_design.py
+Simulations/OldSimFiles/gym_fiber/utils/custom_elastica/__init__.py
+Simulations/OldSimFiles/gym_fiber/utils/custom_elastica/constraint.py
+Simulations/OldSimFiles/gym_fiber/utils/custom_elastica/joint.py
+Simulations/OldSimFiles/gym_fiber/utils/custom_elastica/networkcallback.py
+Simulations/OldSimFiles/gym_fiber/utils/custom_elastica/pointforce.py
+Simulations/OldSimFiles/gym_fiber/utils/custom_elastica/pullingforce.py
+Simulations/OldSimFiles/gym_fiber/utils/render/__init__.py
+Simulations/OldSimFiles/gym_fiber/utils/render/base_renderer.py
+Simulations/OldSimFiles/gym_fiber/utils/render/continuum_snake_postprocessing.py
+Simulations/OldSimFiles/gym_fiber/utils/render/default.inc
+Simulations/OldSimFiles/gym_fiber/utils/render/matplotlib_renderer.py
+Simulations/OldSimFiles/gym_fiber/utils/render/matplotlib_video.py
+Simulations/OldSimFiles/gym_fiber/utils/render/post_processing.py
+Simulations/OldSimFiles/gym_fiber/utils/render/povray_renderer.py
+Simulations/OldSimFiles/gym_fiber/utils/render/pyglet_rendering.py
+Simulations/OldSimFiles/gym_fiber/utils/render/__pycache__/__init__.cpython-38.pyc
+Simulations/OldSimFiles/gym_fiber/utils/render/__pycache__/__init__.cpython-310.pyc
+Simulations/OldSimFiles/gym_fiber/utils/render/__pycache__/base_renderer.cpython-38.pyc
+Simulations/OldSimFiles/gym_fiber/utils/render/__pycache__/base_renderer.cpython-310.pyc
+Simulations/OldSimFiles/gym_fiber/utils/render/__pycache__/matplotlib_renderer.cpython-38.pyc
+Simulations/OldSimFiles/gym_fiber/utils/render/__pycache__/matplotlib_video.cpython-38.pyc
+Simulations/OldSimFiles/gym_fiber/utils/render/__pycache__/post_processing.cpython-38.pyc
+Simulations/OldSimFiles/gym_fiber/utils/render/__pycache__/post_processing.cpython-310.pyc
+Simulations/OldSimFiles/gym_fiber/utils/render/__pycache__/povray_renderer.cpython-38.pyc
+Simulations/OldSimFiles/gym_fiber/utils/render/__pycache__/pyglet_rendering.cpython-38.pyc
+Simulations/OldSimFiles/gym_fiber/wrapper/__init__.py
+Simulations/OldSimFiles/gym_fiber/wrapper/pymarl_env_wrapper.py
+Simulations/OldSimFiles/gym_fiber/wrapper/wrapper_shared_policy_MAenv.py
+Simulations/random_multiple_vibs/diffconstraints_mm_g_s_FiberSim_6rods_15sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-3e-02Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.mp4
+Simulations/random_multiple_vibs/diffconstraints_mm_g_s_FiberSim_8rods_15sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-02Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.mp4
+Simulations/random_multiple_vibs/diffconstraints_mm_g_s_FiberSim_12rods_15sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-8e-02Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.mp4
+Simulations/unit scaling comparisons/comparison of unit scaling.ipynb
+Simulations/unit scaling comparisons/mm_g_s_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.npz
+Simulations/unit scaling comparisons/mm_g_s_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.mp4
+Simulations/unit scaling comparisons/mm_g_s_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.npz
+Simulations/unit scaling comparisons/mm_mg_ms_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.mp4
+Simulations/unit scaling comparisons/mm_mg_ms_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.npz
+Simulations/unit scaling comparisons/mm_mg_ms_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.mp4
+Simulations/unit scaling comparisons/mm_mg_ms_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.npz
