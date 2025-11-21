@@ -341,7 +341,7 @@ class fiber_simulation():
                         ramp_up_time=ramp_up_time, hold_time=hold_time)
         elif self.TYPE_PF=="spline":
             ramp_up_time = 1.0 * time_scale
-            seed_value = 1234 #int(time.time()) % (2**32-1)
+            seed_value = int(time.time()) % (2**32-1) #1234 #
             np.random.seed(seed_value)
 
             sample_time = np.ceil(self.duration).astype(int)
