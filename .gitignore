@@ -389,3 +389,6 @@ Simulations/Tests/test4.mat
 Simulations/Tests/test4.npz
 Simulations/Tests/test5_2by2rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-02Nspline_fps250_stepskip800.mp4
 Simulations/Tests/test5_2by2rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-02Nspline_fps250_stepskip800.npz
+Simulations/OldSimFiles/old_spider_web/SpiderWebNoGym.py
+Simulations/OldSimFiles/old_spider_web/SpiderWebNoGymBoundary.py
+Simulations/OldSimFiles/old_spider_web/SpiderWebNoGymRadial.py
