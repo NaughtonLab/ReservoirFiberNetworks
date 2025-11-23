@@ -15,8 +15,8 @@ from elastica.timestepper import extend_stepper_interface
 from elastica.modules.damping import Damping
 
 from utils.forces.pointforce import PointForce, PointForceSinsusoidal, PointForceSpline
-from utils.networkcallback import NetworkCallBack
-from utils.render.post_processing import plot_network_video, plot_network_video_2D
+from utils.networkcallback import NetworkCallBack, NetworkCallBack_less
+from utils.render.post_processing import plot_network_video, plot_network_video_2D, plot_network_video_2D_less_callback
 
 from tqdm import tqdm
 
@@ -225,7 +225,7 @@ class fiber_simulation():
             for i in range(self.num_horizontal_threads):
                 post_processing_dict_horizontal_thread_each = defaultdict(list)
                 self.simulator.collect_diagnostics(self.horizontal_thread[i]).using(
-                    NetworkCallBack,
+                    NetworkCallBack_less,
                     step_skip=self.step_skip,
                     callback_params=post_processing_dict_horizontal_thread_each,
                 )
@@ -236,7 +236,7 @@ class fiber_simulation():
             for i in range(self.num_vertical_threads):
                 post_processing_dict_vertical_thread_each = defaultdict(list)
                 self.simulator.collect_diagnostics(self.vertical_thread[i]).using(
-                    NetworkCallBack,
+                    NetworkCallBack_less,
                     step_skip=self.step_skip,
                     callback_params=post_processing_dict_vertical_thread_each,
                 )
@@ -417,7 +417,7 @@ class fiber_simulation():
                 x_limits = [-self.thread_length/2-5, self.thread_length/2+5]
                 y_limits = [-self.thread_length/2-5, self.thread_length/2+5]
                 params_str =  f"Young's Modulus = {self.youngs_modulus/modulus_scale:.2e}Pa, Point Force = {self.point_force_mag/force_scale:.0e}N, Tension Force = {self.tension_force/force_scale:.0e}N"
-                plot_network_video_2D(
+                plot_network_video_2D_less_callback(
                     rods_history,
                     video_name=f"{self.loc}{name}.mp4",
                     fps=self.rendering_fps,
