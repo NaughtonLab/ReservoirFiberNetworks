@@ -1101,3 +1101,7 @@ Simulations/SAGE/GridSearch/ForceSweep/ForceFineCliff_198_spacing70_PF0.4N.mp4
 Simulations/SAGE/GridSearch/ForceSweep/ForceFineCliff_198_spacing70_PF0.4N.npz
 Simulations/SAGE/GridSearch/ForceSweep/ForceFineCliff_207_spacing70_PF0.231481N.mp4
 Simulations/SAGE/GridSearch/ForceSweep/ForceFineCliff_207_spacing70_PF0.231481N.npz
+Simulations/SAGE/GridSearch/ForceSweep/ForceCliffSweep_evaluation.csv
+.gitignore
+Simulations/SAGE/GridSearch/TensionSpacing/tension_spacing_force_grid.npz
+Simulations/SAGE/GridSearch/TensionSpacing/tension_spacing_force_grid_new.npz
