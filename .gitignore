@@ -1105,3 +1105,4 @@ Simulations/SAGE/GridSearch/ForceSweep/ForceCliffSweep_evaluation.csv
 .gitignore
 Simulations/SAGE/GridSearch/TensionSpacing/tension_spacing_force_grid.npz
 Simulations/SAGE/GridSearch/TensionSpacing/tension_spacing_force_grid_new.npz
+Simulations/SAGE/OutputReduction/PCA.ipynb
