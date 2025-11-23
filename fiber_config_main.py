@@ -67,4 +67,6 @@ if __name__ == '__main__':
     params_list = [params]
 
     ''' Launching the simulation'''
-    mp_handler(params_list)
+    # mp_handler(params_list)
+    sim = fiber_simulation(**params)
+    sim.launch_sim()
