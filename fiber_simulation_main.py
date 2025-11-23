@@ -40,6 +40,7 @@ class fiber_simulation():
         self.thread_radius = 0.5 * thread_diameter
         self.dx = kwargs.get("dx", 20) # m --> 1e3 mm (1e3)
         self.n_elem = np.rint(self.thread_length/self.dx).astype(int)
+        self.spacing = kwargs.get("spacing", (self.thread_length / (self.num_vertical_threads + 1))) # m --> 1e3 mm (1e3)
 
         '''Young's modulus'''
         self.youngs_modulus = kwargs.get("youngs_modulus", 230e6) # Pa (N/m2) => kg / m / s2 --> 1e3 g / 1e3 mm / s2 (1.0) --> 1e6 mg / 1e3 mm / 1e6 ms2 (1e-3)
@@ -276,6 +277,9 @@ class fiber_simulation():
             print("Data saved as Pickle!!")
         elif self.file_type == "npz":
             rods_history, force_profile, seed_value = data
+            # If you want to add some delay to avoid file writing conflicts in multiprocessing
+            # import os, time, random
+            # time.sleep(random.uniform(0, 3) + (os.getpid() % 3)*0.25)
             np.savez(f'{self.loc}{name}.npz', rods_history=rods_history, force_profile=force_profile, seed_value=seed_value)
             print("Data saved as NPZ!!")
         else:
@@ -300,9 +304,9 @@ class fiber_simulation():
         else:
             raise NotImplementedError ("This unit scaling has not been implemented")
 
-        suffix = f'{self.duration/time_scale:.0f}sec_L{self.thread_length/length_scale:.2e}m_R{self.thread_radius/length_scale:.2e}m_dx{self.dx:.0f}mm_YM{self.youngs_modulus/modulus_scale:.2e}Pa_Density{self.density/density_scale:.2e}kgmm-3_Damping{self.damping_constant:.0f}_TF{self.tension_force/force_scale:.0e}N_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_k{self.k:.0e}_kt{self.kt:.0e}_fps{self.rendering_fps}_stepskip{self.step_skip}'
+        suffix = f'spacing{self.spacing:.4e}m_TF{self.tension_force/force_scale:.0e}N_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_fps{self.rendering_fps}_stepskip{self.step_skip}'
         # name = f"{self.scaling_type}_FiberSim_{self.num_horizontal_threads+self.num_vertical_threads}rods_{suffix}"
-        name = f"diffconstraints_{self.scaling_type}_FiberSim_{self.num_horizontal_threads+self.num_vertical_threads}rods_{suffix}_{self.n_file}"
+        name = f"{self.num_horizontal_threads}by{self.num_vertical_threads}rods_{suffix}_{self.n_file}"
         print(name)
 
         self.add_threads()
@@ -341,7 +345,7 @@ class fiber_simulation():
                         ramp_up_time=ramp_up_time, hold_time=hold_time)
         elif self.TYPE_PF=="spline":
             ramp_up_time = 1.0 * time_scale
-            seed_value = int(time.time()) % (2**32-1) #1234 #
+            seed_value = 1234 #int(time.time()) % (2**32-1) #
             np.random.seed(seed_value)
 
             sample_time = np.ceil(self.duration).astype(int)
@@ -377,7 +381,8 @@ class fiber_simulation():
 
         do_step, stages_and_updates = extend_stepper_interface(self.StatefulStepper, self.simulator)
 
-        for i in tqdm(range(n_steps)):
+        # for i in tqdm(range(n_steps)):
+        for i in range(n_steps):
             current_time = do_step(self.StatefulStepper, stages_and_updates, self.simulator, current_time, self.sim_dt)
 
             for j in range(self.num_horizontal_threads):
@@ -395,6 +400,13 @@ class fiber_simulation():
                     break
                 else:
                     stopped_at_nan = False
+            else:
+                stopped_at_nan = False
+
+            if i%(100/self.sim_dt) == 0 and i != 0:
+                rods_history_temp = self.post_processing_dict_horizontal_thread + self.post_processing_dict_vertical_thread
+                np.savez(f"{self.loc}backup{name}_{i}steps.npz", rods_history=rods_history_temp)
+
 
         if not stopped_at_nan:
             rods_history = self.post_processing_dict_horizontal_thread + self.post_processing_dict_vertical_thread
