@@ -3249,3 +3249,4 @@ Simulations/SAGE/GridSearch/ThreadSpacing/Data_NL/12by12rods_spacing7.0000e-02m_
 Simulations/SAGE/GridSearch/ThreadSpacing/Data_NL/12by12rods_spacing8.0000e-02m_PF-1e-01Nspline_fps250_stepskip800_76.npz
 Simulations/SAGE/GridSearch/ThreadSpacing/Data_NL/12by12rods_spacing9.0000e-02m_PF-1e-01Nspline_fps250_stepskip800_77.npz
 Simulations/SAGE/GridSearch/ForceSpacing/force_spacing_grid.ipynb
+Simulations/SAGE/OutputReduction/num_ops_vs_threads_comparison.ipynb
