@@ -4,8 +4,6 @@ import numpy as np
 import pandas as pd
 from scipy.special import legendre
 from scipy.interpolate import CubicSpline
-import matplotlib
-import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
