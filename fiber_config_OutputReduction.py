@@ -73,7 +73,7 @@ if __name__ == '__main__':
         'VIDEO': False,
 
         'scaling_type': scaling_type,
-        'loc': f'{parent_folder}',
+        'loc': f'{parent_folder}/Data/',
         'file_type': 'npz',
     }
 
