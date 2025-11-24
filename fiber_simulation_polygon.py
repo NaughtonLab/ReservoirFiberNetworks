@@ -14,7 +14,7 @@ from elastica._calculus import _isnan_check
 from elastica.timestepper import extend_stepper_interface
 from elastica.modules.damping import Damping
 
-from utils.forces.pointforce import PointForce, PointForceSinsusoidal, PointForceSpline
+from utils.forces.pointforce import PointForce, PointForceSinsusoidal, PointForceSpline, PointForceImpulse
 from utils.networkcallback import NetworkCallBack
 from utils.render.post_processing import plot_network_video, plot_network_video_2D, plot_network_video_2D_less_callback
 
@@ -58,6 +58,7 @@ class fiber_simulation():
         self.SPREAD_PF = kwargs.get("SPREAD_PF", False)
         self.spread = kwargs.get("spread", 2)
         self.TYPE_PF = kwargs.get("TYPE_PF", "constant")
+        self.t0 = kwargs.get("t0", 1)
 
         """CONNECTION PARAMETERS"""
         self.k = kwargs.get("k", 1e9)
@@ -396,11 +397,10 @@ class fiber_simulation():
         else:
             raise NotImplementedError ("This unit scaling has not been implemented")
 
-        # suffix = f'{self.duration/time_scale:.0f}sec_L{self.polygon_diameter/length_scale:.2e}m_R{self.thread_radius/length_scale:.2e}m_dx{self.dx:.0f}mm_YM{self.youngs_modulus/modulus_scale:.2e}Pa_Density{self.density/density_scale:.2e}kgmm-3_Damping{self.damping_constant:.0f}_TF{self.tension_force/force_scale:.0e}N_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_k{self.k:.0e}_kt{self.kt:.0e}_fps{self.rendering_fps}_stepskip{self.step_skip}'
+        suffix = f'spacing{self.spacing:.4e}m_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_{self.sample_freq}Hz_fps{self.rendering_fps}_stepskip{self.step_skip}'
         # # name = f"{self.scaling_type}_FiberSim_{self.num_horizontal_threads+self.num_vertical_threads}rods_{suffix}"
         # name = f"diffconstraints_{self.scaling_type}_FiberSim_{self.num_sides_polygon}rods_{suffix}_{self.n_file}"
-        name = f"Polygon{self.num_sides_polygon}_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_{self.sample_freq}Hz_{self.n_file}_changedBC"
-        print(name)
+        name = f"Polygon{self.num_sides_polygon}_{suffix}_{self.n_file}"
 
         self.add_threads()
 
@@ -468,6 +468,19 @@ class fiber_simulation():
                         ramp_up_time=ramp_up_time, spline=spline)
                     
                 spline_list.append(spline)
+        elif self.TYPE_PF=="impulse":
+            assert len(vib_thread_idx_list) == 1
+            assert len(node_idx_list) == 1
+
+            for j in range(len(vib_thread_idx_list)):
+
+                node_idx = node_idx_list[j]
+                vib_thread_idx = vib_thread_idx_list[j]
+                vib_thread = self.radial_threads[vib_thread_idx]
+                
+                self.simulator.add_forcing_to(vib_thread).using(
+                    PointForceImpulse, node_idx=node_idx, point_force=point_force,
+                    t0=self.t0, duration=self.sim_dt)
         else:
             raise NotImplementedError ("Invalid type of point force!!")
             
