@@ -20,6 +20,7 @@ def mp_handler(params_list):
     p.map(wrapper_launcher, params_list)
 
 if __name__ == '__main__':
+    """Configuration and Simulation same as SMASIS paper"""
     scaling_type = "mm_g_s"
     params = {
         'num_horizontal_threads': 6,
@@ -46,7 +47,7 @@ if __name__ == '__main__':
         'kt': 1e9, # rotational stiffness of connection
         'nu': 0.0, # translational damping of connection
 
-        'duration': 10, # 1 s --> 1e3 ms
+        'duration': 15, # 1 s --> 1e3 ms
         'sim_dt': 5e-6, # simulation timestep
 
         'rendering_fps': 250,

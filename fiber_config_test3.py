@@ -20,10 +20,11 @@ def mp_handler(params_list):
     p.map(wrapper_launcher, params_list)
 
 if __name__ == '__main__':
+    """Simulating Shaker motion using Displacement Boundary Conditions"""
     scaling_type = "mm_g_s"
     params = {
-        'num_horizontal_threads': 2,
-        'num_vertical_threads': 2,
+        'num_horizontal_threads': 6,
+        'num_vertical_threads': 6,
         'network_origin': np.zeros((3,)), # network_origin is the center of the network
 
         'thread_length': 500e-3, # 1 m --> 1e3 mm
@@ -34,7 +35,7 @@ if __name__ == '__main__':
         'density': 1e3, # 1 kg / mm3 --> 1e-6 g/mm3 --> 1e-3 mg/mm3
 
         'tension_force': 1e-2, # 1 N = kg m/s2 --> 1e6 g mm/s2 --> 1e3 mg mm /ms2  
-        'point_force_mag': -0.02, # 1 N = kg m/s2 --> 1e6 g mm/s2 --> 1e3 mg mm /ms2 
+        'point_force_mag': -0.2, # 1 N = kg m/s2 --> 1e6 g mm/s2 --> 1e3 mg mm /ms2 
         'SPREAD_PF': True, # whether the force should be a gaussian spread across 5 nodes or just applied at a single point
         'TYPE_PF': "spline", # type of force to be applied 
         'sample_freq_pf': 5, # Sampling frequency for random point force
@@ -46,14 +47,14 @@ if __name__ == '__main__':
         'kt': 1e9, # rotational stiffness of connection
         'nu': 0.0, # translational damping of connection
 
-        'duration': 300, # 1 s --> 1e3 ms
+        'duration': 15, # 1 s --> 1e3 ms
         'sim_dt': 5e-6, # simulation timestep
 
         'rendering_fps': 250,
         
         'STOP_AT_NAN': True,
         'SAVE': True,
-        'VIDEO': True,
+        'VIDEO': False,
 
         'scaling_type': scaling_type,
         'loc': './Simulations/Tests/',

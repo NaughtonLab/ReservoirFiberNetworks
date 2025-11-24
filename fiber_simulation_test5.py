@@ -442,9 +442,8 @@ class fiber_simulation():
                 force_profile = np.sin(time_array*(2 * np.pi)/0.3)*np.sin(time_array*(2 * np.pi)/1.0)*self.point_force_mag
             elif self.TYPE_PF=="spline":
                 force_profile = [spline_i(time_array)*self.point_force_mag for spline_i in spline_list]
-            elif self.TYPE_PF=="varying_sine":
-                force_profile = [np.sin(2*np.pi*spline_i(time_array)*time_array)*self.point_force_mag for spline_i in spline_list]
-                print(len(force_profile))
+            elif self.TYPE_PF=="out_of_plane":
+                force_profile = [spline_i(time_array)*self.point_force_mag for spline_i in spline_list]
             else:
                 print("Invalid type of point force!!")
 

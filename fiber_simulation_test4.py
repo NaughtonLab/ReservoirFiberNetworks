@@ -61,6 +61,7 @@ class fiber_simulation():
         self.SPREAD_PF = kwargs.get("SPREAD_PF", False)
         self.spread = kwargs.get("spread", 2)
         self.TYPE_PF = kwargs.get("TYPE_PF", "constant")
+        self.hold_time_freq_list = kwargs.get("hold_time_freq_list", [(i, 5*i, 5*(i+1)) for i in range(1, 11)])
 
         """CONNECTION PARAMETERS"""
         self.k = kwargs.get("k", 1e9)
@@ -274,8 +275,8 @@ class fiber_simulation():
                 pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
             print("Data saved as Pickle!!")
         elif self.file_type == "npz":
-            rods_history, force_profile, seed_value = data
-            np.savez(f'{self.loc}{name}.npz', rods_history=rods_history, force_profile=force_profile, seed_value=seed_value)
+            rods_history, force_profile = data
+            np.savez(f'{self.loc}{name}.npz', rods_history=rods_history, force_profile=force_profile)
             print("Data saved as NPZ!!")
         else:
             print("Invalid file type!!")
@@ -367,12 +368,11 @@ class fiber_simulation():
 
             for j in range(len(vib_thread_idx_list)):
                 ramp_up_time = 1.0 * time_scale
-                hold_time1 = self.duration / 3 * time_scale
-                hold_time2 = self.duration / 3 * time_scale
-                hold_time3 = self.duration / 3 * time_scale
-                freq1 = 2 / time_scale
-                freq2 = 7 / time_scale
-                freq3 = 19 / time_scale
+                self.hold_time_freq_list_scaled = [(self.hold_time_freq_list[i][0]/time_scale, 
+                                                    self.hold_time_freq_list[i][1]*time_scale, 
+                                                    self.hold_time_freq_list[i][2]*time_scale) for i in range(len(self.hold_time_freq_list))]
+
+                hold_time_freq_array = np.array(self.hold_time_freq_list_scaled)                           
 
                 node_idx = node_idx_list[j]
                 vib_thread_idx = vib_thread_idx_list[j]
@@ -381,10 +381,9 @@ class fiber_simulation():
                 for i in point_force_spread:
                     self.simulator.add_forcing_to(vib_thread).using(
                         PointForceVaryingSinsusoidal, node_idx=node_idx+i, point_force=point_force*stencil[i],
-                        ramp_up_time=ramp_up_time, hold_time1=hold_time1, hold_time2=hold_time2, hold_time3=hold_time3,
-                        freq1=freq1, freq2=freq2, freq3=freq3)
+                        ramp_up_time=ramp_up_time, hold_time_freq_array=hold_time_freq_array)
                     
-            varying_sine_list = [(hold_time1, freq1), (hold_time2, freq2), (hold_time3, freq3)]
+            varying_sine_list = [hold_time_freq_array]
         else:
             raise NotImplementedError ("Invalid type of point force!!")
             
@@ -419,6 +418,7 @@ class fiber_simulation():
 
         if not stopped_at_nan:
             rods_history = self.post_processing_dict_horizontal_thread + self.post_processing_dict_vertical_thread
+            np.savez(f'{self.loc}{name}_backup.npz', rods_history=rods_history)
             time_array = np.array(rods_history[0]["time"])
             if self.TYPE_PF=="constant":
                 force_profile = np.full_like(time_array, self.point_force_mag)
@@ -427,17 +427,11 @@ class fiber_simulation():
             elif self.TYPE_PF=="spline":
                 force_profile = [spline_i(time_array)*self.point_force_mag for spline_i in spline_list]
             elif self.TYPE_PF=="varying_sine":
-                force_profile = np.zeros_like(time_array)
-                t0 = 0.0
-                for hold_time, freq in varying_sine_list:
-                    t1 = t0 + hold_time
-                    indices = np.where((time_array >= t0) & (time_array < t1))
-                    force_profile[indices] = np.sin(2*np.pi*freq*time_array[indices])*self.point_force_mag
-                    t0 = t1
+                force_profile = varying_sine_list
             else:
                 print("Invalid type of point force!!")
 
-            data = ([rods_history] + [force_profile] + [seed_value])
+            data = ([rods_history] + [force_profile])
             
             if self.SAVE:
                 self.save_data(data, name)

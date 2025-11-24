@@ -20,6 +20,7 @@ def mp_handler(params_list):
     p.map(wrapper_launcher, params_list)
 
 if __name__ == '__main__':
+    """Out of Plane spline force"""
     scaling_type = "mm_g_s"
     params = {
         'num_horizontal_threads': 2,

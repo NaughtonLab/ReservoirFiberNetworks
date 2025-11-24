@@ -332,6 +332,18 @@ class fiber_simulation():
 
         vib_thread_idx_list, node_idx_list = self.get_node_idx()
 
+        seed_value = 1234
+        np.random.seed(seed_value)
+
+        sample_time = np.ceil(self.duration).astype(int)
+        x_sample = np.linspace(0, sample_time, sample_time*self.sample_freq + 1)
+
+        y_sample = np.random.uniform(-1,1, size=sample_time*self.sample_freq+1)
+        y_sample[0] = 0.0    
+        spline = CubicSpline(x_sample, y_sample)
+        spline_list = []
+        spline_list.append(spline)
+
         # if self.TYPE_PF=="constant":
         #     ramp_up_time = 0.25 * time_scale
         #     hold_time = 5.0 * time_scale
@@ -442,10 +454,7 @@ class fiber_simulation():
             elif self.TYPE_PF=="sinusoidal":
                 force_profile = np.sin(time_array*(2 * np.pi)/0.3)*np.sin(time_array*(2 * np.pi)/1.0)*self.point_force_mag
             elif self.TYPE_PF=="spline":
-                force_profile = [spline_i(time_array)*self.point_force_mag for spline_i in spline_list]
-            elif self.TYPE_PF=="varying_sine":
-                force_profile = [np.sin(2*np.pi*spline_i(time_array)*time_array)*self.point_force_mag for spline_i in spline_list]
-                print(len(force_profile))
+                force_profile = [spline_i(time_array)*self.point_force_mag/1e6 for spline_i in spline_list]
             else:
                 print("Invalid type of point force!!")
 

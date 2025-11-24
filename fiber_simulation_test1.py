@@ -364,31 +364,6 @@ class fiber_simulation():
                         ramp_up_time=ramp_up_time, spline=spline)
                     
                 spline_list.append(spline)
-        elif self.TYPE_PF=="varying_sine":
-            ramp_up_time = 1.0 * time_scale
-            seed_value = 42 #int(time.time()) % (2**32-1)
-            np.random.seed(seed_value)
-
-            sample_time = np.ceil(self.duration).astype(int)
-            x_sample = np.linspace(0, sample_time, sample_time*self.sample_freq + 1)
-
-            spline_list = []
-
-            for j in range(len(vib_thread_idx_list)):
-                y_sample = np.random.uniform(-1,1, size=sample_time*self.sample_freq+1)
-                y_sample[0] = 0.0    
-                spline = CubicSpline(x_sample, y_sample)
-
-                node_idx = node_idx_list[j]
-                vib_thread_idx = vib_thread_idx_list[j]
-                vib_thread = self.horizontal_thread[vib_thread_idx]
-
-                for i in point_force_spread:
-                    self.simulator.add_forcing_to(vib_thread).using(
-                        PointForceVaryingSine, node_idx=node_idx+i, point_force=point_force*stencil[i],
-                        ramp_up_time=ramp_up_time, spline=spline)
-                    
-            spline_list.append(spline)
         else:
             raise NotImplementedError ("Invalid type of point force!!")
             

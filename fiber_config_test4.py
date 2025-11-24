@@ -20,6 +20,11 @@ def mp_handler(params_list):
     p.map(wrapper_launcher, params_list)
 
 if __name__ == '__main__':
+    """Applying a sine wave with certain frequency for 5 seconds, then changing the frequency"""
+    freq_list = [i for i in range(1, 11)]
+    hold_time_freq = 5
+    hold_time_freq_list = [(f, hold_time_freq*(f-1), hold_time_freq*(f)) for f in freq_list]
+    duration = hold_time_freq * len(freq_list)
     scaling_type = "mm_g_s"
     params = {
         'num_horizontal_threads': 6,
@@ -36,8 +41,8 @@ if __name__ == '__main__':
         'tension_force': 1e-2, # 1 N = kg m/s2 --> 1e6 g mm/s2 --> 1e3 mg mm /ms2  
         'point_force_mag': -0.2, # 1 N = kg m/s2 --> 1e6 g mm/s2 --> 1e3 mg mm /ms2 
         'SPREAD_PF': True, # whether the force should be a gaussian spread across 5 nodes or just applied at a single point
-        'TYPE_PF': "spline", # type of force to be applied 
-        'sample_freq_pf': 5, # Sampling frequency for random point force
+        'TYPE_PF': "varying_sine", # type of force to be applied 
+        'hold_time_freq_list': hold_time_freq_list,
 
         'damping_constant': 10, 
         'filter_order': 6,
@@ -46,14 +51,14 @@ if __name__ == '__main__':
         'kt': 1e9, # rotational stiffness of connection
         'nu': 0.0, # translational damping of connection
 
-        'duration': 300, # 1 s --> 1e3 ms
+        'duration': duration, # 1 s --> 1e3 ms
         'sim_dt': 5e-6, # simulation timestep
 
         'rendering_fps': 250,
         
         'STOP_AT_NAN': True,
         'SAVE': True,
-        'VIDEO': True,
+        'VIDEO': False,
 
         'scaling_type': scaling_type,
         'loc': './Simulations/Tests/',
