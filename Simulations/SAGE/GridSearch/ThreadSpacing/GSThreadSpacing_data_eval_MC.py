@@ -377,16 +377,16 @@ def nonlinearity_memory_matrix(input, output, leg_max_order, max_timesteps_back,
 if __name__ == "__main__":
 
     fps = 250
-    folder = '.' #'Simulations/SAGE/GridSearch/ThreadSpacing'
-    path = f'{folder}/Data_MC/'
+    folder = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(folder, 'Data_MC', '')
 
-    csv_name = 'GSEvaluation_MC'
-
+    csv_name = os.path.join(folder, 'GSEvaluation_MC')
+    
     regressor = "Rid"
     test_size = 0.25
     alpha = 0.01
 
-    grid = np.load(f'{folder}/thread_spacing_grid_MC.npz', allow_pickle=True)
+    grid = np.load(os.path.join(folder, 'thread_spacing_grid_MC.npz'), allow_pickle=True)
     grid = grid['grid']
 
     idx_list = [i for i in range(84)]

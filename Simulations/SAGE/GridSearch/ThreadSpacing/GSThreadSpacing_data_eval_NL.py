@@ -377,16 +377,16 @@ def nonlinearity_memory_matrix(input, output, leg_max_order, max_timesteps_back,
 if __name__ == "__main__":
 
     fps = 250
-    folder = '.' #'Simulations/SAGE/GridSearch/ThreadSpacing'
-    path = f'{folder}/Data_NL/'
+    folder = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(folder, 'Data_NL', '')
 
-    csv_name = 'GSEvaluation_NL'
+    csv_name = os.path.join(folder, 'GSEvaluation_NL')
     
     regressor = "Rid"
     test_size = 0.25
     alpha = 0.01
 
-    grid = np.load(f'{folder}/thread_spacing_grid_NL.npz', allow_pickle=True)
+    grid = np.load(os.path.join(folder, 'thread_spacing_grid_NL.npz'), allow_pickle=True)
     grid = grid['grid']
 
     idx_list = [i for i in range(84)]
@@ -394,7 +394,7 @@ if __name__ == "__main__":
     if idx_list[0] == 0:
         df = pd.DataFrame(columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity', 'memory'])
     else:
-        df = pd.read_csv(f"{folder}/{csv_name}.csv")
+        df = pd.read_csv(f"{csv_name}.csv")
 
     for idx in idx_list:
         grid_data = grid[idx]
@@ -477,4 +477,4 @@ if __name__ == "__main__":
         
         print(idx, "eval done.")
 
-    df.to_csv(f"{folder}/{csv_name}.csv", index=False)
+    df.to_csv(f"{csv_name}.csv", index=False)
