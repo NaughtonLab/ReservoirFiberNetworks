@@ -377,7 +377,7 @@ def nonlinearity_memory_matrix(input, output, leg_max_order, max_timesteps_back,
 if __name__ == "__main__":
 
     fps = 250
-    folder = 'Simulations/SAGE/GridSearch/ThreadSpacing'
+    folder = '.' #'Simulations/SAGE/GridSearch/ThreadSpacing'
     path = f'{folder}/Data_NL/'
 
     csv_name = 'GSEvaluation_NL'
