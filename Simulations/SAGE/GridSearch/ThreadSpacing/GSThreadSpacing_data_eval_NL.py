@@ -380,7 +380,7 @@ if __name__ == "__main__":
     folder = os.path.dirname(os.path.abspath(__file__))
     path = os.path.join(folder, 'Data_NL', '')
 
-    csv_name = os.path.join(folder, 'GSEvaluation_NL')
+    csv_name = os.path.join(folder, 'GSEvaluation_NL_cap')
     
     regressor = "Rid"
     test_size = 0.25
@@ -389,10 +389,10 @@ if __name__ == "__main__":
     grid = np.load(os.path.join(folder, 'thread_spacing_grid_NL.npz'), allow_pickle=True)
     grid = grid['grid']
 
-    idx_list = [i for i in range(84)]
+    idx_list = [i for i in range(0, 84)]
 
     if idx_list[0] == 0:
-        df = pd.DataFrame(columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity', 'memory'])
+        df = pd.DataFrame(columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test'])
     else:
         df = pd.read_csv(f"{csv_name}.csv")
 
@@ -404,76 +404,98 @@ if __name__ == "__main__":
         point_force_mag = grid_data[2]
         thread_length = spacing * (num_vertical_threads+1)
 
-        skip = 800
-        suffix = f'spacing{spacing:.4e}m_PF{-point_force_mag:.0e}Nspline_fps250_stepskip{skip}'
+        # skip = 800
+        # suffix = f'spacing{spacing:.4e}m_PF{-point_force_mag:.0e}Nspline_fps250_stepskip{skip}'
 
-        sim_name = f'{num_horizontal_threads}by{num_vertical_threads}rods_{suffix}_{idx}'
-        sim_ip_data, sim_op_data, sim_time_data = load_simulation_data(file_path = f"{path}{sim_name}",
-                                                                        file_type = 'npz',
-                                                                        start = 0,
-                                                                        num_horizontal_threads = num_horizontal_threads,
-                                                                        num_vertical_threads = num_vertical_threads,
-                                                                        step = 1)
+        # sim_name = f'{num_horizontal_threads}by{num_vertical_threads}rods_{suffix}_{idx}'
+        # sim_ip_data, sim_op_data, sim_time_data = load_simulation_data(file_path = f"{path}{sim_name}",
+        #                                                                 file_type = 'npz',
+        #                                                                 start = 0,
+        #                                                                 num_horizontal_threads = num_horizontal_threads,
+        #                                                                 num_vertical_threads = num_vertical_threads,
+        #                                                                 step = 1)
                                                                         
-        ### Evaluation
-        input_data = sim_ip_data[0]
-        output_data = sim_op_data[0]
-        time_data = sim_time_data[0]
+        # ### Evaluation
+        # input_data = sim_ip_data[0]
+        # output_data = sim_op_data[0]
+        # time_data = sim_time_data[0]
+
+        data = np.load(f"{path}{idx}_eval.npz", allow_pickle=True)
+        input_data = data['input_data']
+        # leg_R2_test_list = data['nonlinearity'][3]
+        # mem_R2_test_list = data['memory'][3]
+        leg_cap_train_list = data['nonlinearity'][0]
+        mem_cap_train_list = data['memory'][0]
+        leg_cap_test_list = data['nonlinearity'][1]
+        mem_cap_test_list = data['memory'][1]
         
         if not np.isnan(input_data).any():
             print(idx)
 
-            input_data = -1 + (input_data - np.min(input_data)) / (np.max(input_data) - np.min(input_data)) * (1 - (-1))
+            # input_data = -1 + (input_data - np.min(input_data)) / (np.max(input_data) - np.min(input_data)) * (1 - (-1))
 
-            print(input_data.shape, output_data.shape)
+            # print(input_data.shape, output_data.shape)
 
-            # Nonlinearity testing
-            leg_max_order = 10
-            leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list = nonlinearity_testing(input_data, output_data, leg_max_order, regressor, test_size, alpha)
+            # # Nonlinearity testing
+            # leg_max_order = 10
+            # leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list = nonlinearity_testing(input_data, output_data, leg_max_order, regressor, test_size, alpha)
             
-            # Memory testing
-            max_time_back_seconds = 1
-            max_timesteps_back = np.rint(fps*max_time_back_seconds).astype(int)
-            mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list = memory_testing(input_data, output_data, max_timesteps_back, regressor, test_size, alpha)
+            # # Memory testing
+            # max_time_back_seconds = 1
+            # max_timesteps_back = np.rint(fps*max_time_back_seconds).astype(int)
+            # mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list = memory_testing(input_data, output_data, max_timesteps_back, regressor, test_size, alpha)
 
-            # Nonlinearity-Memory matrix
-            capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix = nonlinearity_memory_matrix(input_data, output_data, leg_max_order, max_timesteps_back, regressor, test_size, alpha)
+            # # Nonlinearity-Memory matrix
+            # capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix = nonlinearity_memory_matrix(input_data, output_data, leg_max_order, max_timesteps_back, regressor, test_size, alpha)
 
-            onc = sum(leg_capacity_test_list)/len(leg_capacity_test_list)
-            omc = sum(mem_capacity_test_list)/len(mem_capacity_test_list)
+            # onc = sum(leg_R2_test_list)/len(leg_R2_test_list)
+            # omc = sum(mem_R2_test_list)/len(mem_R2_test_list)
 
-            print(onc, omc)
+            # print(onc, omc)
+
+            onc_train = sum(leg_cap_train_list)/len(leg_cap_train_list)
+            omc_train = sum(mem_cap_train_list)/len(mem_cap_train_list)
+            onc_test = sum(leg_cap_test_list)/len(leg_cap_test_list)
+            omc_test = sum(mem_cap_test_list)/len(mem_cap_test_list)
             
         else:
-            leg_capacity_train_list = np.nan
-            leg_R2_train_list = np.nan
-            mem_capacity_train_list = np.nan
-            mem_R2_train_list = np.nan
-            capacity_train_matrix = np.nan
-            R2_train_matrix = np.nan
-            leg_capacity_test_list = np.nan
-            leg_R2_test_list = np.nan
-            mem_capacity_test_list = np.nan
-            mem_R2_test_list = np.nan
-            capacity_test_matrix = np.nan
-            R2_test_matrix = np.nan
-            onc = np.nan
-            omc = np.nan
+            # leg_capacity_train_list = np.nan
+            # leg_R2_train_list = np.nan
+            # mem_capacity_train_list = np.nan
+            # mem_R2_train_list = np.nan
+            # capacity_train_matrix = np.nan
+            # R2_train_matrix = np.nan
+            # leg_capacity_test_list = np.nan
+            # leg_R2_test_list = np.nan
+            # mem_capacity_test_list = np.nan
+            # mem_R2_test_list = np.nan
+            # capacity_test_matrix = np.nan
+            # R2_test_matrix = np.nan
+            # onc = np.nan
+            # omc = np.nan
+            onc_train = np.nan
+            omc_train = np.nan
+            onc_test = np.nan
+            omc_test = np.nan
 
         # Save results in dataframe
         df.at[idx, 'num_threads'] = num_horizontal_threads
         df.at[idx, 'spacing(mm)'] = spacing*1e3
         df.at[idx, 'length(mm)'] = thread_length*1e3
         df.at[idx, 'force_mag(N)'] = point_force_mag
-        df.at[idx, 'nonlinearity'] = onc
-        df.at[idx, 'memory'] = omc
+        # df.at[idx, 'nonlinearity'] = onc
+        # df.at[idx, 'memory'] = omc
+        df.at[idx, 'nonlinearity train'] = onc_train
+        df.at[idx, 'memory train'] = omc_train
+        df.at[idx, 'nonlinearity test'] = onc_test
+        df.at[idx, 'memory test'] = omc_test
 
-        np.savez(f"{path}{idx}_eval.npz", input_data=input_data, 
-                output_data=output_data, 
-                time_data=time_data, 
-                nonlinearity=[leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list], 
-                memory=[mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list], 
-                heatmap=[capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix])
+        # np.savez(f"{path}{idx}_eval.npz", input_data=input_data, 
+        #         output_data=output_data, 
+        #         time_data=time_data, 
+        #         nonlinearity=[leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list], 
+        #         memory=[mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list], 
+        #         heatmap=[capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix])
         
         print(idx, "eval done.")
 

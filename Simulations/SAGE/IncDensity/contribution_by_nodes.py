@@ -1,9 +1,11 @@
 import os
-import pickle
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+
 from scipy.special import legendre
 from scipy.interpolate import CubicSpline
+
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
@@ -77,11 +79,16 @@ def preprocess_rod_data(rods_history, num_horizontal_threads, num_vertical_threa
     hor_connect_idx = np.linspace(0, n_elem+1, num_vertical_threads+2)
     hor_connect_idx = hor_connect_idx[1:-1]
 
+    actuation_thread = num_horizontal_threads//2
+    actuation_space = actuation_thread
+
     num_connection_nodes = num_horizontal_threads * num_vertical_threads
     connection_nodes = []
     for i in range(num_horizontal_threads):
         for j in range(num_vertical_threads):
-            connection_nodes.append(rod_pos[i][..., int(hor_connect_idx[j])][..., 0:2])
+            if i == actuation_thread or i == actuation_thread-1:
+                if j == actuation_thread or j == actuation_thread-1:
+                    connection_nodes.append(rod_pos[i][..., int(hor_connect_idx[j])][..., 0:2])
 
     connection_nodes = np.hstack([connection_nodes[i] for i in range(len(connection_nodes))])
 
@@ -95,28 +102,32 @@ def preprocess_rod_data(rods_history, num_horizontal_threads, num_vertical_threa
         start_node_idx = 0
         end_node_idx = n_elem + 1
         for j in range(num_vertical_threads+1):
-            if j <= num_vertical_threads-1:
-                midpoint_node_idx = (start_node_idx + vert_connect_idx[j])/2
-                start_node_idx = vert_connect_idx[j]
-            else:
-                midpoint_node_idx = (vert_connect_idx[-1] + end_node_idx)/2
-            midpoint_node_idx = int(midpoint_node_idx)
-            current_midpoint = rod_pos[i][..., midpoint_node_idx][..., 0:2]
-            segment_midpoints.append(current_midpoint)
+            if i == actuation_thread or i == actuation_thread-1:
+                if j >= actuation_space-1 and j <= actuation_space+1:
+                    if j <= num_vertical_threads-1:
+                        midpoint_node_idx = (start_node_idx + vert_connect_idx[j])/2
+                        start_node_idx = vert_connect_idx[j]
+                    else:
+                        midpoint_node_idx = (vert_connect_idx[-1] + end_node_idx)/2
+                    midpoint_node_idx = int(midpoint_node_idx)
+                    current_midpoint = rod_pos[i][..., midpoint_node_idx][..., 0:2]
+                    segment_midpoints.append(current_midpoint)
             
     # Getting data of segment midpoints for vertical threads
     for i in range(num_vertical_threads):
         start_node_idx = 0
         end_node_idx = n_elem + 1
         for j in range(num_horizontal_threads+1):
-            if j <= num_horizontal_threads-1:
-                midpoint_node_idx = (start_node_idx + hor_connect_idx[j])/2
-                start_node_idx = hor_connect_idx[j]
-            else:
-                midpoint_node_idx = (hor_connect_idx[-1] + end_node_idx)/2
-            midpoint_node_idx = int(midpoint_node_idx)
-            current_midpoint = rod_pos[i+num_horizontal_threads][..., midpoint_node_idx][..., 0:2]
-            segment_midpoints.append(current_midpoint)
+            if i == actuation_thread or i == actuation_thread-1:
+                if j >= actuation_space-1 and j <= actuation_space+1:
+                    if j <= num_horizontal_threads-1:
+                        midpoint_node_idx = (start_node_idx + hor_connect_idx[j])/2
+                        start_node_idx = hor_connect_idx[j]
+                    else:
+                        midpoint_node_idx = (hor_connect_idx[-1] + end_node_idx)/2
+                    midpoint_node_idx = int(midpoint_node_idx)
+                    current_midpoint = rod_pos[i+num_horizontal_threads][..., midpoint_node_idx][..., 0:2]
+                    segment_midpoints.append(current_midpoint)
 
     segment_midpoints = np.hstack([segment_midpoints[i] for i in range(len(segment_midpoints))])
     num_outputs = num_connection_nodes + num_segment_midpoints
@@ -129,7 +140,56 @@ def preprocess_rod_data(rods_history, num_horizontal_threads, num_vertical_threa
     op = scaler.transform(output)
 
     return op
-    
+
+def get_near_actuation_16(output_data, num_threads):
+
+    num_conns = num_threads*num_threads*2
+    num_hors = num_threads*(num_threads+1)*2
+    num_vers = num_hors
+
+    conns = output_data[:, :num_conns]
+    hors = output_data[:, num_conns:(num_conns+num_hors)]
+    vers = output_data[:, (num_conns+num_hors):]
+
+    actuation_thread = num_threads//2
+    actuation_space = actuation_thread
+
+    num_hors_per_thread = 2*(num_threads+1)
+
+    for i in range(num_threads): # Horizontal threads
+        if i == actuation_thread or i == actuation_thread-1:
+            current_start_idx = i*(num_threads+1)*2
+            hors_current_thread = hors[:, current_start_idx:current_start_idx+num_hors_per_thread]
+            relevant_hors = []
+            for j in range(num_threads+1):
+                if j <= actuation_space + 1 and j >= actuation_space - 1:
+                    hors_current_space = hors_current_thread[:, 2*j:(2*j+1)+1]
+                    relevant_hors.append(hors_current_space)
+
+            conns_current_thread = conns[:, i*num_threads*2:(i+1)*num_threads*2]
+            relevant_conns = []
+            for k in range(num_threads): # Vertical threads
+                if k == actuation_thread or k == actuation_thread-1:
+                    conns_current_ver_thread = conns_current_thread[:, 2*k:(2*k+1)+1]
+                    relevant_conns.append(conns_current_ver_thread)
+
+    for i in range(num_threads): # Vertical Threads
+        if i == actuation_thread or i == actuation_thread-1:
+            vers_current_thread = vers[:, i*(num_threads+1)*2:(i+1)*(num_threads+1)*2]
+            relevant_vers = []
+            for j in range(num_threads+1):
+                if j <= actuation_space + 1 and j >= actuation_space - 1:
+                    vers_current_space = vers_current_thread[:, 2*j:(2*j+1)+1]
+                    relevant_vers.append(vers_current_space)
+
+    final_conns = np.hstack([relevant_conns[i] for i in range(len(relevant_conns))])
+    final_hors = np.hstack([relevant_hors[i] for i in range(len(relevant_hors))])
+    final_vers = np.hstack([relevant_vers[i] for i in range(len(relevant_vers))])
+
+    final_nodes = np.hstack([final_conns, final_hors, final_vers])
+
+    return final_nodes
+
 def nonlinearity_testing(input, output, leg_max_order, regressor, test_size, alpha):
     if regressor == "Lin":
         ### Linear Regression
@@ -302,201 +362,111 @@ def memory_testing(input, output, max_timesteps_back, regressor, test_size, alph
 
     return capacity_train_list, capacity_test_list, R2_train_list, R2_test_list
 
-def nonlinearity_memory_matrix(input, output, leg_max_order, max_timesteps_back, regressor, test_size, alpha):
-    if regressor == "Lin":
-        ### Linear Regression
-        clf = LinearRegression()
-    elif regressor == "Rid":
-        ### Ridge Regression
-        clf = Ridge(alpha=alpha)
-    else:
-        print("Please specify the regressor")
-
-    capacity_train_matrix = np.zeros((leg_max_order, max_timesteps_back+1))
-    capacity_test_matrix = np.zeros((leg_max_order, max_timesteps_back+1))
-    R2_train_matrix = np.zeros((leg_max_order, max_timesteps_back+1))
-    R2_test_matrix = np.zeros((leg_max_order, max_timesteps_back+1))
-
-    for n in range(1, leg_max_order+1):
-        leg = legendre(n)
-        for t in range(max_timesteps_back+1):
-            x = output[t:]
-            if t == 0:
-                y = leg(input)
-            else:
-                y = leg(input[:-t])
-
-            y2 = (1/len(y)) * np.sum((y-np.mean(y))**2)
-        
-            x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42, shuffle=False)
-
-            # Training
-            clf.fit(x_train, y_train)
-            y_train_pred = clf.predict(x_train)
-            
-            idx = np.where(abs(y_train_pred) > 1)
-            y_train_pred[idx] = np.mean(y)
-            y_train[idx, 0] = np.mean(y)
-            
-            y2_train = (1/len(y_train)) * np.sum((y_train-np.mean(y_train))**2)
-    
-            MSE = mean_squared_error(y_true=y_train, y_pred=y_train_pred)
-            capacity_train = 1 - MSE/y2_train
-            R2_train = r2_score(y_true=y_train, y_pred=y_train_pred)
-    
-            # Testing
-            y_test_pred = clf.predict(x_test)
-    
-            idx = np.where(abs(y_test_pred) > 1)
-            y_test_pred[idx] = np.mean(y)
-            y_test[idx, 0] = np.mean(y)
-    
-            y2_test = (1/len(y_test)) * np.sum((y_test-np.mean(y_test))**2)
-    
-            MSE = mean_squared_error(y_true=y_test, y_pred=y_test_pred)
-            capacity_test = 1 - MSE/y2_test
-            R2_test = r2_score(y_true=y_test, y_pred=y_test_pred)
-    
-            if R2_test < 0:
-                R2_test = 0
-            if R2_train < 0:
-                R2_train = 0
-            if capacity_test < 0:
-                capacity_test = 0
-            if capacity_train < 0:
-                capacity_train = 0
-
-            capacity_train_matrix[n-1, t] = capacity_train
-            capacity_test_matrix[n-1, t] = capacity_test
-            R2_train_matrix[n-1, t] = R2_train
-            R2_test_matrix[n-1, t] = R2_test
-
-    return capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix
-
-
-if __name__ == "__main__":
-
+if __name__=="__main__":
     fps = 250
     folder = os.path.dirname(os.path.abspath(__file__))
-    path = os.path.join(folder, 'Data_MC', '')
+    path = os.path.join(folder, 'Data', '')
 
-    csv_name = os.path.join(folder, 'GSEvaluation_MC_cap')
-    
-    regressor = "Rid"
-    test_size = 0.25
-    alpha = 1e-2
+    csv_name = os.path.join(folder, 'IncDensity_reduced_op')
 
-    grid = np.load(os.path.join(folder, 'thread_spacing_grid_MC.npz'), allow_pickle=True)
+    grid = np.load(os.path.join(folder, 'density_list.npz'), allow_pickle=True)
     grid = grid['grid']
 
-    idx_list = [i for i in range(0, 84)]
+    idx_list = [i for i in range(6)]
+
+    regressor = "Rid"
+    test_size = 0.25
+    alpha = 1e-2    
+    
+    leg_max_order = 10
+    max_time_back_seconds = 1
+    max_timesteps_back = np.rint(fps*max_time_back_seconds).astype(int)
+
+    idx_list = [i for i in range(6)]
 
     if idx_list[0] == 0:
-        df = pd.DataFrame(columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test'])
+        df = pd.DataFrame(columns = ['num_threads', 'nonlinearity', 'memory', 'nonlinearity_red_op', 'memory_red_op'])
     else:
-        df = pd.read_csv(f"{csv_name}.csv")
+        df = pd.read_csv(f"{folder}/{csv_name}.csv")
 
     for idx in idx_list:
+
         grid_data = grid[idx]
         num_horizontal_threads = int(grid_data[0])
         num_vertical_threads = num_horizontal_threads
-        spacing = grid_data[1]
         point_force_mag = grid_data[2]
-        thread_length = spacing * (num_vertical_threads+1)
-
-        # skip = 800
-        # suffix = f'spacing{spacing:.4e}m_PF{-point_force_mag:.0e}Nspline_fps250_stepskip{skip}'
-
-        # sim_name = f'{num_horizontal_threads}by{num_vertical_threads}rods_{suffix}_{idx}'
-        # sim_ip_data, sim_op_data, sim_time_data = load_simulation_data(file_path = f"{path}{sim_name}",
-        #                                                                 file_type = 'npz',
-        #                                                                 start = 0,
-        #                                                                 num_horizontal_threads = num_horizontal_threads,
-        #                                                                 num_vertical_threads = num_vertical_threads,
-        #                                                                 step = 1)
-                                                                        
-        # ### Evaluation
-        # input_data = sim_ip_data[0]
-        # output_data = sim_op_data[0]
-        # time_data = sim_time_data[0]
+        spacing = grid_data[1]
+        thread_length = 500e-3
 
         data = np.load(f"{path}{idx}_eval.npz", allow_pickle=True)
-        input_data = data['input_data']
-        # leg_R2_test_list = data['nonlinearity'][3]
-        # mem_R2_test_list = data['memory'][3]
-        leg_cap_train_list = data['nonlinearity'][0]
-        mem_cap_train_list = data['memory'][0]
-        leg_cap_test_list = data['nonlinearity'][1]
-        mem_cap_test_list = data['memory'][1]
-        
-        if not np.isnan(input_data).any():
-            print(idx)
+        leg_cap_list = data['nonlinearity'][1]
+        mem_cap_list = data['memory'][1]
+        onc = sum(leg_cap_list)/len(leg_cap_list)
+        omc = sum(mem_cap_list)/len(mem_cap_list)
 
-            # input_data = -1 + (input_data - np.min(input_data)) / (np.max(input_data) - np.min(input_data)) * (1 - (-1))
+        if num_horizontal_threads != 2:
 
-            # print(input_data.shape, output_data.shape)
+            skip = 800
+            suffix = f'spacing{spacing:.4e}m_TF1e-02N_PF{-point_force_mag:.0e}Nspline_fps250_stepskip{skip}'
 
-            # # Nonlinearity testing
-            # leg_max_order = 10
-            # leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list = nonlinearity_testing(input_data, output_data, leg_max_order, regressor, test_size, alpha)
-            
-            # # Memory testing
-            # max_time_back_seconds = 1
-            # max_timesteps_back = np.rint(fps*max_time_back_seconds).astype(int)
-            # mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list = memory_testing(input_data, output_data, max_timesteps_back, regressor, test_size, alpha)
+            sim_name = f'{num_horizontal_threads}by{num_vertical_threads}rods_{suffix}_{idx}'
+            sim_ip_data, sim_op_data, sim_time_data = load_simulation_data(file_path = f"{path}{sim_name}",
+                                                                            file_type = 'npz',
+                                                                            start = 0,
+                                                                            num_horizontal_threads = num_horizontal_threads,
+                                                                            num_vertical_threads = num_vertical_threads,
+                                                                            step = 1)
+                                                                            
+            ## Evaluation
+            input_data = sim_ip_data[0]
+            output_data = sim_op_data[0]
+            time_data = sim_time_data[0]
 
-            # # Nonlinearity-Memory matrix
-            # capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix = nonlinearity_memory_matrix(input_data, output_data, leg_max_order, max_timesteps_back, regressor, test_size, alpha)
+            if not np.isnan(input_data).any():
 
-            # onc = sum(leg_R2_test_list)/len(leg_R2_test_list)
-            # omc = sum(mem_R2_test_list)/len(mem_R2_test_list)
+                input_data = -1 + (input_data - np.min(input_data)) / (np.max(input_data) - np.min(input_data)) * (1 - (-1))
 
-            # print(onc, omc)
+                print(input_data.shape, output_data.shape)
 
-            onc_train = sum(leg_cap_train_list)/len(leg_cap_train_list)
-            omc_train = sum(mem_cap_train_list)/len(mem_cap_train_list)
-            onc_test = sum(leg_cap_test_list)/len(leg_cap_test_list)
-            omc_test = sum(mem_cap_test_list)/len(mem_cap_test_list)
-            
+                # Nonlinearity testing
+                leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list = nonlinearity_testing(input_data, output_data, leg_max_order, regressor, test_size, alpha)
+                
+                # Memory testing
+                mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list = memory_testing(input_data, output_data, max_timesteps_back, regressor, test_size, alpha)
+
+                onc_new = sum(leg_capacity_test_list)/len(leg_capacity_test_list)
+                omc_new = sum(mem_capacity_test_list)/len(mem_capacity_test_list)
+
+                np.savez(f"{path}{idx}_eval_reduced_op.npz", input_data=input_data, 
+                            output_data=output_data, 
+                            time_data=time_data, 
+                            nonlinearity=[leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list], 
+                            memory=[mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list])
+
         else:
-            # leg_capacity_train_list = np.nan
-            # mem_capacity_train_list = np.nan
-            # leg_R2_train_list = np.nan
-            # mem_R2_train_list = np.nan
-            # capacity_train_matrix = np.nan
-            # R2_train_matrix = np.nan
-            # leg_capacity_test_list = np.nan
-            # mem_capacity_test_list = np.nan
-            # leg_R2_test_list = np.nan
-            # mem_R2_test_list = np.nan
-            # capacity_test_matrix = np.nan
-            # R2_test_matrix = np.nan
-            # onc = np.nan
-            # omc = np.nan
-            onc_train = np.nan
-            omc_train = np.nan
-            onc_test = np.nan
-            omc_test = np.nan
+            leg_cap_list = data['nonlinearity'][1]
+            mem_cap_list = data['memory'][1]
+            onc = sum(leg_cap_list)/len(leg_cap_list)
+            omc = sum(mem_cap_list)/len(mem_cap_list)
+            onc_new = onc
+            omc_new = omc
 
         # Save results in dataframe
         df.at[idx, 'num_threads'] = num_horizontal_threads
-        df.at[idx, 'spacing(mm)'] = spacing*1e3
-        df.at[idx, 'length(mm)'] = thread_length*1e3
-        df.at[idx, 'force_mag(N)'] = point_force_mag
-        # df.at[idx, 'nonlinearity'] = onc
-        # df.at[idx, 'memory'] = omc
-        df.at[idx, 'nonlinearity train'] = onc_train
-        df.at[idx, 'memory train'] = omc_train
-        df.at[idx, 'nonlinearity test'] = onc_test
-        df.at[idx, 'memory test'] = omc_test
+        df.at[idx, 'nonlinearity'] = onc
+        df.at[idx, 'memory'] = omc
+        df.at[idx, 'nonlinearity_red_op'] = onc_new
+        df.at[idx, 'memory_red_op'] = omc_new
 
-        # np.savez(f"{path}{idx}_eval.npz", input_data=input_data, 
-        #         output_data=output_data, 
-        #         time_data=time_data, 
-        #         nonlinearity=[leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list], 
-        #         memory=[mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list], 
-        #         heatmap=[capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix])
-        
         print(idx, "eval done.")
 
     df.to_csv(f"{csv_name}.csv", index=False)
+
+
+        
+
+        
+
+        
+
+
