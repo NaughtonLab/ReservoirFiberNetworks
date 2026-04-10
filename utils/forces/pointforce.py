@@ -6,17 +6,17 @@ import numpy as np
 class PointForce(NoForces):
     """
     This class applies constant forces on a specific node.
-
         Attributes
         ----------
-        start_force: numpy.ndarray
-            1D (dim) array containing data with 'float' type. Force applied to first node of the system.
-        end_force: numpy.ndarray
-            1D (dim) array containing data with 'float' type. Force applied to last node of the system.
+        node_idx: int
+            Index of the node where force is applied.
+        point_force: numpy.ndarray
+            1D (dim) array containing data with 'float' type. Force applied to
+            last node of the system.
         ramp_up_time: float
             Applied forces are ramped up until ramp up time.
         hold_time: float
-            Applied forces are held for this length of time before being released. 
+            Applied forces are held for this length of time before being released.
 
     """
 
@@ -92,20 +92,18 @@ class PointForce(NoForces):
 
 class PointForceSinsusoidal(NoForces):
     """
-    This class applies constant forces on a specific node.
-
+    This class applies sinusoidal forces on a specific node.
         Attributes
         ----------
-        start_force: numpy.ndarray
-            1D (dim) array containing data with 'float' type. Force applied to first node of the system.
-        end_force: numpy.ndarray
-            1D (dim) array containing data with 'float' type. Force applied to last node of the system.
-        ramp_up_time: float
-            Applied forces are ramped up until ramp up time.
+        node_idx: int
+            Index of the node where force is applied.
+        point_force: numpy.ndarray
+            1D (dim) array containing data with 'float' type. Force applied to
+            last node of the system.
 
     """
 
-    def __init__(self, node_idx, point_force, ramp_up_time, hold_time):
+    def __init__(self, node_idx, point_force, time_period_1, time_period_2):
         """
 
         Parameters
@@ -113,18 +111,19 @@ class PointForceSinsusoidal(NoForces):
         point_force: numpy.ndarray
             1D (dim) array containing data with 'float' type.
             Force applied to last node of the system.
-        ramp_up_time: float
-            Applied forces are ramped up until ramp up time.
+        node_idx: int
+            Index of the node where force is applied.
+        time_period_1: float
+            Time period of the first sine wave.
+        time_period_2: float
+            Time period of the second sine wave.
 
         """
         super(PointForceSinsusoidal, self).__init__()
         self.node_idx = node_idx
         self.point_force = point_force
-        assert ramp_up_time > 0.0
-        self.ramp_up_time = ramp_up_time
-        assert hold_time >= 0.0
-        self.hold_time = hold_time
-
+        self.time_period_1 = time_period_1
+        self.time_period_2 = time_period_2
 
     def apply_forces(self, system: SystemType, time=0.0):
         # self.point_force = 
@@ -133,15 +132,15 @@ class PointForceSinsusoidal(NoForces):
             self.node_idx,
             self.point_force,
             time,
-            self.ramp_up_time,
-            self.hold_time,
+            self.time_period_1,
+            self.time_period_2,
         )
 
     
     @staticmethod
     @njit(cache=True)
     def compute_end_point_forces(
-        external_forces, node_idx, point_force, time, ramp_up_time, hold_time
+        external_forces, node_idx, point_force, time, time_period_1, time_period_2
     ):
         """
         Compute end point forces that are applied on the rod using numba njit decorator.
@@ -156,32 +155,31 @@ class PointForceSinsusoidal(NoForces):
             1D (dim) array containing data with 'float' type.
             Force applied to last node of the system.
         time: float
-        ramp_up_time: float
-            Applied forces are ramped up until ramp up time.
+        time_period_1: float
+            Time period of the first sine wave.
+        time_period_2: float
+            Time period of the second sine wave.
 
         Returns
         -------
 
         """
 
-        time_period_1 = 0.3
-        time_period_2 = 1.0
-
         external_forces[..., node_idx] += np.sin(time * (2 * np.pi)/time_period_1) * np.sin(time * (2 * np.pi)/time_period_2) * point_force
 
 
 class PointForceSpline(NoForces):
     """
-    This class applies spline forces on a specific node.
-
+    This class applies forces on a specific node that vary according to a spline function.
         Attributes
         ----------
         node_idx: int
             Index of the node where force is applied.
-        point_force: float
-            Magnitude of the force applied to the node.
+        point_force: numpy.ndarray
+            1D (dim) array containing data with 'float' type. Force applied to 
+            last node of the system.
         spline: callable
-            A spline function that defines how the force varies with time.      
+            A spline function that defines how the force varies with time.
 
     """
 
@@ -238,18 +236,19 @@ class PointForceSpline(NoForces):
 
         external_forces[..., node_idx] += ft * point_force
 
-class PointForceVaryingOmega(NoForces):
+class PointForceSplineVaryingSinusoidal(NoForces):
     """
-    This class applies sinusoidal forces with a randomly varying frequency on a specific node.
-
+    This class applies sinusoidal forces with a time-varying frequency on a specific node.
+    The frequency varies according to a predefined spline function.
         Attributes
         ----------
         node_idx: int
             Index of the node where force is applied.
-        point_force: float
-            Amplitude of the sine wave.
-        ramp_up_time: float
-            Applied forces are ramped up until ramp up time.
+        point_force: numpy.ndarray
+            1D (dim) array containing data with 'float' type. Force applied to
+            last node of the system.
+        spline: callable
+            A spline function that defines how the frequency varies with time.
 
     """
 
@@ -267,7 +266,7 @@ class PointForceVaryingOmega(NoForces):
             A spline function that defines how the frequency varies with time.
 
         """
-        super(PointForceVaryingOmega, self).__init__()
+        super(PointForceSplineVaryingSinusoidal, self).__init__()
         self.node_idx = node_idx
         self.point_force = point_force
         self.s = spline
@@ -306,7 +305,7 @@ class PointForceVaryingOmega(NoForces):
 
         external_forces[..., node_idx] += ft * point_force
 
-class PointForceVaryingSinsusoidal(NoForces):
+class PointForceHoldVaryingSinsusoidal(NoForces):
     """
     This class applies sinuosoidal forces with a time-varying frequency on a specific node.
     This frequency varies according to a predefined array of hold times and frequencies.
@@ -334,7 +333,7 @@ class PointForceVaryingSinsusoidal(NoForces):
         hold_time_freq_array: numpy.ndarray
             2D array where each row contains [frequency, hold_time_start, hold_time_end]
         """
-        super(PointForceVaryingSinsusoidal, self).__init__()
+        super(PointForceHoldVaryingSinsusoidal, self).__init__()
         self.node_idx = node_idx
         self.point_force = point_force
         self.hold_time_freq_array = hold_time_freq_array
@@ -375,15 +374,6 @@ class PointForceVaryingSinsusoidal(NoForces):
         idx = np.where((hold_time_freq_array[:, 1]<= time) & (hold_time_freq_array[:, 2]> time))[0][0]
         freq = hold_time_freq_array[idx, 0]
         external_forces[..., node_idx] += np.sin(time * (2 * np.pi) * freq) * point_force
-
-        # if time <= hold_time1:
-        #     external_forces[..., node_idx] += np.sin(time * (2 * np.pi) * freq1) * point_force
-        # elif time > hold_time1 and time <= hold_time1 + hold_time2:
-        #     external_forces[..., node_idx] += np.sin(time * (2 * np.pi) * freq2) * point_force
-        # elif time > hold_time1 + hold_time2 and time <= hold_time1 + hold_time2 + hold_time3:
-        #     external_forces[..., node_idx] += np.sin(time * (2 * np.pi) * freq3) * point_force
-        # else:
-        #     external_forces[..., node_idx] += 0.0 * point_force
 
 class PointForceImpulse(NoForces):
     """

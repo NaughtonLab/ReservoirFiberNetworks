@@ -344,7 +344,6 @@ class fiber_simulation():
                         PointForceSinsusoidal, node_idx=node_idx+i, point_force=point_force*stencil[i],
                         ramp_up_time=ramp_up_time, hold_time=hold_time)
         elif self.TYPE_PF=="spline":
-            ramp_up_time = 1.0 * time_scale
             seed_value = 1234 #int(time.time()) % (2**32-1) #
             np.random.seed(seed_value)
 
@@ -364,8 +363,7 @@ class fiber_simulation():
                 
                 for i in point_force_spread:
                     self.simulator.add_forcing_to(vib_thread).using(
-                        PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i],
-                        ramp_up_time=ramp_up_time, spline=spline)
+                        PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i], spline=spline)
                     
                 spline_list.append(spline)
         else:
