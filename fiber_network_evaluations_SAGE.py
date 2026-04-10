@@ -41,6 +41,21 @@ def get_sim_name_and_update_data_frame(grid_data, case_name, idx, update_df):
                 df.at[idx, 'spacing(mm)'] = spacing*1e3
                 df.at[idx, 'length(mm)'] = thread_length*1e3
                 df.at[idx, 'force_mag(N)'] = point_force_mag
+        case "Force_Sweep":
+            num_horizontal_threads = 4
+            num_vertical_threads = num_horizontal_threads
+            spacing = 70e-3
+            point_force_mag = grid_data
+            thread_length = spacing * (num_vertical_threads+1)
+
+            skip = 800
+            suffix = f'spacing{spacing:.4e}m_PF{-point_force_mag:.0e}Nspline_fps250_stepskip{skip}'
+
+            if update_df:
+                df.at[idx, 'num_threads'] = num_horizontal_threads
+                df.at[idx, 'spacing(mm)'] = spacing*1e3
+                df.at[idx, 'length(mm)'] = thread_length*1e3
+                df.at[idx, 'force_mag(N)'] = point_force_mag
 
         case "GS_Tension_Spacing":
             num_horizontal_threads = 4
@@ -104,14 +119,14 @@ def get_sim_name_and_update_data_frame(grid_data, case_name, idx, update_df):
 if __name__ == "__main__":
     
     fps = 250
-    folder = os.path.dirname(os.path.abspath(__file__))
     case_name = "GS_Thread_Spacing_NL"
     regenerate_ip = True
     update_df = False
 
     match case_name:
         case "GS_Force_Spacing":
-            path = f'{folder}/Data/'
+            folder = os.path.join(os.getcwd(), 'Simulations/SAGE/GridSearch/ForceSpacing')
+            path = os.path.join(folder, 'Data', '')
             csv_name = 'GSEvaluation_force_100sec_cap'
 
             regressor = "Rid"
@@ -128,7 +143,21 @@ if __name__ == "__main__":
 
             columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test']
 
+        case "Force_Sweep":
+            folder = os.path.join(os.getcwd(), 'Simulations/SAGE/ForceSweep')
+            path = os.path.join(folder, 'Data', '')
+
+            csv_name = 'ForceCliffSweep_evaluation'
+
+            grid = np.load(f'{folder}/forces_sweep.npz', allow_pickle=True)
+            grid = grid['sweep']
+
+            idx_list = [i for i in range(9)]
+
+            columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity', 'memory']
+            
         case "GS_Tension_Spacing":
+            folder = os.path.join(os.getcwd(), 'Simulations/SAGE/GridSearch/TensionSpacing')
             path = os.path.join(folder, 'Data', '')
             csv_name = 'GSEvaluation_tension_cap'
 
@@ -144,6 +173,7 @@ if __name__ == "__main__":
             columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'tension(N)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test']
 
         case "GS_Thread_Spacing_NL":
+            folder = os.path.join(os.getcwd(), 'Simulations/SAGE/GridSearch/ThreadSpacing')
             path = os.path.join(folder, 'Data_NL', '')
             csv_name = os.path.join(folder, 'GSEvaluation_NL_cap')
 
@@ -159,6 +189,7 @@ if __name__ == "__main__":
             columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test']
 
         case "GS_Thread_Spacing_MC":
+            folder = os.path.join(os.getcwd(), 'Simulations/SAGE/GridSearch/ThreadSpacing')
             path = os.path.join(folder, 'Data_MC', '')
             csv_name = os.path.join(folder, 'GSEvaluation_MC_cap')
             
