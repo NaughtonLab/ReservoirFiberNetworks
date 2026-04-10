@@ -9,6 +9,15 @@ from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 
+'''
+This script is used to load the simulation data for the Thread-Spacing Memory grid search, preprocess the data,
+and evaluate the nonlinearity and memory capacities of the system. The results are saved in a dataframe
+and also in individual npz files for each simulation index. The evaluation can be done using either
+linear regression or ridge regression, and the parameters for the evaluation can be easily changed by uncommenting
+the relevant lines in the code. This script is designed to be run after the simulations have been completed
+and the data has been saved in the specified format.
+'''
+
 def load_simulation_data(file_path, file_type, start, num_horizontal_threads, num_vertical_threads, step):
     input_data = []
     output_data = []
@@ -404,75 +413,74 @@ if __name__ == "__main__":
         point_force_mag = grid_data[2]
         thread_length = spacing * (num_vertical_threads+1)
 
-        # skip = 800
-        # suffix = f'spacing{spacing:.4e}m_PF{-point_force_mag:.0e}Nspline_fps250_stepskip{skip}'
+        skip = 800
+        suffix = f'spacing{spacing:.4e}m_PF{-point_force_mag:.0e}Nspline_fps250_stepskip{skip}'
 
-        # sim_name = f'{num_horizontal_threads}by{num_vertical_threads}rods_{suffix}_{idx}'
-        # sim_ip_data, sim_op_data, sim_time_data = load_simulation_data(file_path = f"{path}{sim_name}",
-        #                                                                 file_type = 'npz',
-        #                                                                 start = 0,
-        #                                                                 num_horizontal_threads = num_horizontal_threads,
-        #                                                                 num_vertical_threads = num_vertical_threads,
-        #                                                                 step = 1)
+        sim_name = f'{num_horizontal_threads}by{num_vertical_threads}rods_{suffix}_{idx}'
+        sim_ip_data, sim_op_data, sim_time_data = load_simulation_data(file_path = f"{path}{sim_name}",
+                                                                        file_type = 'npz',
+                                                                        start = 0,
+                                                                        num_horizontal_threads = num_horizontal_threads,
+                                                                        num_vertical_threads = num_vertical_threads,
+                                                                        step = 1)
                                                                         
-        # ### Evaluation
-        # input_data = sim_ip_data[0]
-        # output_data = sim_op_data[0]
-        # time_data = sim_time_data[0]
+        ### Evaluation
+        input_data = sim_ip_data[0]
+        output_data = sim_op_data[0]
+        time_data = sim_time_data[0]
 
-        data = np.load(f"{path}{idx}_eval.npz", allow_pickle=True)
-        input_data = data['input_data']
-        # leg_R2_test_list = data['nonlinearity'][3]
-        # mem_R2_test_list = data['memory'][3]
-        leg_cap_train_list = data['nonlinearity'][0]
-        mem_cap_train_list = data['memory'][0]
-        leg_cap_test_list = data['nonlinearity'][1]
-        mem_cap_test_list = data['memory'][1]
+        ### Uncomment the below lines to load previously evaluated data that needs to be re-evaluated to avoid reloading the simulation data and redoing the preprocessing steps. This is useful when we want to change the parameters of the evaluation (e.g., regressor, test size, alpha) and want to quickly get the new evaluation results without having to wait for the data loading and preprocessing steps.
+        # data = np.load(f"{path}{idx}_eval.npz", allow_pickle=True)
+        # input_data = data['input_data']
+        # output_data = data['output_data']
+        # time_data = data['time_data']
+        # leg_capacity_train_list = data['nonlinearity'][0]
+        # mem_capacity_train_list = data['memory'][0]
+        # leg_capacity_test_list = data['nonlinearity'][1]
+        # mem_capacity_test_list = data['memory'][1]
         
         if not np.isnan(input_data).any():
             print(idx)
 
-            # input_data = -1 + (input_data - np.min(input_data)) / (np.max(input_data) - np.min(input_data)) * (1 - (-1))
+            input_data = -1 + (input_data - np.min(input_data)) / (np.max(input_data) - np.min(input_data)) * (1 - (-1))
 
-            # print(input_data.shape, output_data.shape)
+            print(input_data.shape, output_data.shape)
 
-            # # Nonlinearity testing
-            # leg_max_order = 10
-            # leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list = nonlinearity_testing(input_data, output_data, leg_max_order, regressor, test_size, alpha)
+            # Nonlinearity testing
+            leg_max_order = 10
+            leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list = nonlinearity_testing(input_data, output_data, leg_max_order, regressor, test_size, alpha)
             
-            # # Memory testing
-            # max_time_back_seconds = 1
-            # max_timesteps_back = np.rint(fps*max_time_back_seconds).astype(int)
-            # mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list = memory_testing(input_data, output_data, max_timesteps_back, regressor, test_size, alpha)
+            # Memory testing
+            max_time_back_seconds = 1
+            max_timesteps_back = np.rint(fps*max_time_back_seconds).astype(int)
+            mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list = memory_testing(input_data, output_data, max_timesteps_back, regressor, test_size, alpha)
 
-            # # Nonlinearity-Memory matrix
-            # capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix = nonlinearity_memory_matrix(input_data, output_data, leg_max_order, max_timesteps_back, regressor, test_size, alpha)
+            # Nonlinearity-Memory matrix
+            capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix = nonlinearity_memory_matrix(input_data, output_data, leg_max_order, max_timesteps_back, regressor, test_size, alpha)
 
-            # onc = sum(leg_R2_test_list)/len(leg_R2_test_list)
-            # omc = sum(mem_R2_test_list)/len(mem_R2_test_list)
+            onc = sum(leg_R2_test_list)/len(leg_R2_test_list)
+            omc = sum(mem_R2_test_list)/len(mem_R2_test_list)
 
-            # print(onc, omc)
+            print(onc, omc)
 
-            onc_train = sum(leg_cap_train_list)/len(leg_cap_train_list)
-            omc_train = sum(mem_cap_train_list)/len(mem_cap_train_list)
-            onc_test = sum(leg_cap_test_list)/len(leg_cap_test_list)
-            omc_test = sum(mem_cap_test_list)/len(mem_cap_test_list)
-            
+            onc_train = sum(leg_capacity_train_list)/len(leg_capacity_train_list)
+            omc_train = sum(mem_capacity_train_list)/len(mem_capacity_train_list)
+            onc_test = sum(leg_capacity_test_list)/len(leg_capacity_test_list)
+            omc_test = sum(mem_capacity_test_list)/len(mem_capacity_test_list)
+
         else:
-            # leg_capacity_train_list = np.nan
-            # leg_R2_train_list = np.nan
-            # mem_capacity_train_list = np.nan
-            # mem_R2_train_list = np.nan
-            # capacity_train_matrix = np.nan
-            # R2_train_matrix = np.nan
-            # leg_capacity_test_list = np.nan
-            # leg_R2_test_list = np.nan
-            # mem_capacity_test_list = np.nan
-            # mem_R2_test_list = np.nan
-            # capacity_test_matrix = np.nan
-            # R2_test_matrix = np.nan
-            # onc = np.nan
-            # omc = np.nan
+            leg_capacity_train_list = np.nan
+            leg_R2_train_list = np.nan
+            mem_capacity_train_list = np.nan
+            mem_R2_train_list = np.nan
+            capacity_train_matrix = np.nan
+            R2_train_matrix = np.nan
+            leg_capacity_test_list = np.nan
+            leg_R2_test_list = np.nan
+            mem_capacity_test_list = np.nan
+            mem_R2_test_list = np.nan
+            capacity_test_matrix = np.nan
+            R2_test_matrix = np.nan
             onc_train = np.nan
             omc_train = np.nan
             onc_test = np.nan

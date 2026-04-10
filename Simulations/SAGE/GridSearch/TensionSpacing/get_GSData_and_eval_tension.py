@@ -4,17 +4,19 @@ import numpy as np
 import pandas as pd
 from scipy.special import legendre
 from scipy.interpolate import CubicSpline
+import matplotlib
+import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 
 '''
-This script is used to load the simulation data for the Thread-Spacing Nonlinearity grid search, preprocess the data,
-and evaluate the nonlinearity and memory capacities of the system. The results are saved in a dataframe
-and also in individual npz files for each simulation index. The evaluation can be done using either
-linear regression or ridge regression, and the parameters for the evaluation can be easily changed by uncommenting
-the relevant lines in the code. This script is designed to be run after the simulations have been completed
+This script is used to load the simulation data for the Tension-Spacing grid search, preprocess the data,
+and evaluate the nonlinearity and memory capacities of the system. The results are saved in a dataframe 
+and also in individual npz files for each simulation index. The evaluation can be done using either linear 
+regression or ridge regression, and the parameters for the evaluation can be easily changed by uncommenting 
+the relevant lines in the code. This script is designed to be run after the simulations have been completed 
 and the data has been saved in the specified format.
 '''
 
@@ -387,29 +389,31 @@ if __name__ == "__main__":
 
     fps = 250
     folder = os.path.dirname(os.path.abspath(__file__))
-    path = os.path.join(folder, 'Data_MC', '')
+    print(folder)
+    path = f'{folder}/Data/'
 
-    csv_name = os.path.join(folder, 'GSEvaluation_MC_cap')
-    
+    csv_name = 'GSEvaluation_tension_cap'
+
+    grid = np.load(f'{folder}/tension_spacing_force_grid_new.npz', allow_pickle=True)
+    grid = grid['grid']
+
+    idx_list = [i for i in range(36)]
+
     regressor = "Rid"
     test_size = 0.25
     alpha = 1e-2
 
-    grid = np.load(os.path.join(folder, 'thread_spacing_grid_MC.npz'), allow_pickle=True)
-    grid = grid['grid']
-
-    idx_list = [i for i in range(0, 84)]
-
     if idx_list[0] == 0:
-        df = pd.DataFrame(columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test'])
+        df = pd.DataFrame(columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'tension(N)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test'])
     else:
-        df = pd.read_csv(f"{csv_name}.csv")
+        df = pd.read_csv(f"{folder}/{csv_name}.csv")
 
     for idx in idx_list:
         grid_data = grid[idx]
-        num_horizontal_threads = int(grid_data[0])
+        num_horizontal_threads = 4
         num_vertical_threads = num_horizontal_threads
-        spacing = grid_data[1]
+        tension = grid_data[0]
+        spacing = grid_data[1]*1e-3
         point_force_mag = grid_data[2]
         thread_length = spacing * (num_vertical_threads+1)
 
@@ -453,15 +457,17 @@ if __name__ == "__main__":
             # Memory testing
             max_time_back_seconds = 1
             max_timesteps_back = np.rint(fps*max_time_back_seconds).astype(int)
+            # max_timesteps_back = 10
+            # max_time_back_seconds = np.rint(max_timesteps_back/sample_freq).astype(int)
             mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list = memory_testing(input_data, output_data, max_timesteps_back, regressor, test_size, alpha)
 
             # Nonlinearity-Memory matrix
             capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix = nonlinearity_memory_matrix(input_data, output_data, leg_max_order, max_timesteps_back, regressor, test_size, alpha)
 
-            onc = sum(leg_R2_test_list)/len(leg_R2_test_list)
-            omc = sum(mem_R2_test_list)/len(mem_R2_test_list)
+            onc = sum(leg_capacity_test_list)/len(leg_capacity_test_list)
+            omc = sum(mem_capacity_test_list)/len(mem_capacity_test_list)
 
-            print(onc, omc)
+            # print(onc, omc)
 
             onc_train = sum(leg_capacity_train_list)/len(leg_capacity_train_list)
             omc_train = sum(mem_capacity_train_list)/len(mem_capacity_train_list)
@@ -471,16 +477,10 @@ if __name__ == "__main__":
         else:
             leg_capacity_train_list = np.nan
             mem_capacity_train_list = np.nan
-            leg_R2_train_list = np.nan
-            mem_R2_train_list = np.nan
             capacity_train_matrix = np.nan
-            R2_train_matrix = np.nan
             leg_capacity_test_list = np.nan
             mem_capacity_test_list = np.nan
-            leg_R2_test_list = np.nan
-            mem_R2_test_list = np.nan
             capacity_test_matrix = np.nan
-            R2_test_matrix = np.nan
             onc_train = np.nan
             omc_train = np.nan
             onc_test = np.nan
@@ -490,6 +490,7 @@ if __name__ == "__main__":
         df.at[idx, 'num_threads'] = num_horizontal_threads
         df.at[idx, 'spacing(mm)'] = spacing*1e3
         df.at[idx, 'length(mm)'] = thread_length*1e3
+        df.at[idx, 'tension(N)'] = tension
         df.at[idx, 'force_mag(N)'] = point_force_mag
         df.at[idx, 'nonlinearity train'] = onc_train
         df.at[idx, 'memory train'] = omc_train
@@ -499,10 +500,10 @@ if __name__ == "__main__":
         np.savez(f"{path}{idx}_eval.npz", input_data=input_data, 
                 output_data=output_data, 
                 time_data=time_data, 
-                nonlinearity=[leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list], 
-                memory=[mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list], 
-                heatmap=[capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix])
+                nonlinearity=[leg_capacity_train_list, leg_capacity_test_list], 
+                memory=[mem_capacity_train_list, mem_capacity_test_list], 
+                heatmap=[capacity_train_matrix, capacity_test_matrix])
         
         print(idx, "eval done.")
 
-    df.to_csv(f"{csv_name}.csv", index=False)
+    df.to_csv(f"{folder}/{csv_name}.csv", index=False)
