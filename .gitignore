@@ -1,125 +1,11 @@
+# main
 *.pyc
 *.nbc
 *.nbi
 *.zip
-FiberSim_1rods_5sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02constant_k1e+09_kt1e+09_fps250.mp4
-FiberSim_1rods_5sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02sinusoidal_k1e+09_kt1e+09_fps250.mp4
-FiberSim_1rods_5sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02spline_k1e+09_kt1e+09_fps250.mp4
-FiberSim_4rods_10sec_L1.00e+03_R2.50e+01_dx20_YM2.30e+08_Damping10_TF1e+04_PF-2e+05_k1e+09_kt1e+09_fps250.mp4
-ARCFiberSim_1rods_5sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02sinusoidal_k1e+09_kt1e+09_fps250.mp4
-ARCFiberSim_1rods_5000sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+03_Density1.00e+00_Damping10_TF1e+01_PF-5e-01sinusoidal_k1e+09_kt1e+09_fps250.pickle
-FiberSim_1rods_6sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02spline_k1e+09_kt1e+09_fps250.csv
-FiberSim_1rods_6sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02spline_k1e+09_kt1e+09_fps250.mp4
-FiberSim_1rods_6sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+06_Density1.00e-03_Damping10_TF1e+04_PF-5e+02spline_k1e+09_kt1e+09_fps250.pickle
-FiberSim_1rods_5000sec_L5.00e+02_R2.25e-01_dx10_YM5.00e+03_Density1.00e+00_Damping10_TF1e+01_PF-5e-01spline_k1e+09_kt1e+09_fps250.pickle
-ARCFiberSim_1rods_5sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-04Nspline_k1e+09_kt1e+09_fps250_stepskip800_mm_g_s.mp4
-diffconstraints_hardcodedvibs_mm_g_s_FiberSim_8rods_15sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-2e-02Nspline_k1e+09_kt1e+09_fps250_stepskip800.mp4
-diffconstraints_mm_g_s_FiberSim_4rods_15sec_L5.00e-01m_R1.00e-03m_dx20mm_YM1.00e+08Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-2e-02Nspline_k1e+09_kt1e+09_fps250_stepskip800.mp4
-diffconstraints_mm_g_s_FiberSim_8rods_15sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-02Nspline_k1e+09_kt1e+09_fps250_stepskip800.mp4
-diffconstraints_randomvibs_mm_g_s_FiberSim_8rods_15sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-2e-02Nspline_k1e+09_kt1e+09_fps250_stepskip800.mp4
-EFRI_diffconstraints_mm_g_s_FiberSim_4rods_15sec_L1.00e+00m_R2.00e-03m_dx20mm_YM2.30e+08Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-2e-01Nspline_k1e+09_kt1e+09_fps250_stepskip800.mp4
-FiberSim_1rods_5000sec_L5.00e+02_R2.25e-01_dx20_YM5.00e+05_Density1.00e+00_Damping10_TF1e+01_PF-5e+02spline_k1e+09_kt1e+09_fps2500_stepskip8000.mp4
-mm_g_s_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.mp4
-mm_g_s_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800.npz
-mm_g_s_FiberSim_1rods_5sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.mp4
-mm_g_s_FiberSim_1rods_5sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-04Nspline_k1e+09_kt1e+09_fps250_stepskip800.mp4
-mm_g_s_FiberSim_4rods_15sec_L1.00e+00m_R2.00e-03m_dx20mm_YM2.30e+08Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-2e-01Nspline_k1e+09_kt1e+09_fps250_stepskip800.mp4
-mm_g_s_FiberSim_4rods_15sec_L5.00e-01m_R1.00e-03m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-2e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800.mp4
-mm_mg_ms_FiberSim_1rods_5sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps2500_stepskip8000.mp4
-mm_mg_ms_FiberSim_1rods_5sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-04Nspline_k1e+09_kt1e+09_fps2500_stepskip8000.mp4
-npz_trial_mm_g_s_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800.mp4
-SMASIS_sims/2by2/*
-visualization.ipynb
-Bokun_Change_Property.py
 *.pptx
-random_spline_4rods.npz
-random_spline_legendre.png
-random_spline_memory.png
-random_spline_trialdiffconstraints_mm_g_s_FiberSim_4rods_10sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.mp4
-random_spline_trialdiffconstraints_mm_g_s_FiberSim_4rods_10sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.npz
 *.pdf
-networks.png
-polygon_sketches.png
-Simulations/legendre_sum_eval_test0to2.png
-Simulations/memory_sum_eval_test0to2.png
-Simulations/Tests/*.png
-Simulations/Tests/*.mat
-Simulations/Tests/*.mp4
-Simulations/Tests/*.npz
-Simulations/OldSimFiles/old_spider_web/SpiderWebNoGym.py
-Simulations/OldSimFiles/old_spider_web/SpiderWebNoGymBoundary.py
-Simulations/OldSimFiles/old_spider_web/SpiderWebNoGymRadial.py
-Simulations/Polygon/*.mp4
-Simulations/Polygon/*.npz
-Simulations/SAGE/GS_plotting.ipynb
-Simulations/SAGE/SAGE_GridSearch/fiber_config_NL.py
-Simulations/SAGE/SAGE_GridSearch/ForceCliffSweep_evaluation.csv
-Simulations/SAGE/SAGE_GridSearch/GSEvaluation_force_100.csv
-Simulations/SAGE/SAGE_GridSearch/GSEvaluation_MC.csv
-Simulations/SAGE/SAGE_GridSearch/GSEvaluation_new_100s_1.csv
-Simulations/SAGE/SAGE_GridSearch/GSEvaluation_new_100s.csv
-Simulations/SAGE/SAGE_GridSearch/GSEvaluation_NL.csv
-Simulations/SAGE/SAGE_GridSearch/GSEvaluation_old.csv
-Simulations/SAGE/SAGE_GridSearch/GSEvaluation_polygon_spafo.csv
-Simulations/SAGE/SAGE_GridSearch/GSEvaluation_tension_old.csv
-Simulations/SAGE/SAGE_GridSearch/GSEvaluation_tension.csv
-Simulations/SAGE/SAGE_GridSearch/GSForceEvaluation.csv
-Simulations/SAGE/SAGE_GridSearch/GSForceFineEvaluation_dx.csv
-Simulations/SAGE/SAGE_GridSearch/GSForceFineEvaluation_lower_tri.csv
-Simulations/SAGE/SAGE_GridSearch/GSForceFineEvaluation.csv
-Simulations/SAGE/SAGE_GridSearch/tension_spacing_force_grid.npz
-Simulations/SAGE/SAGE_GridSearch/thread_length_grid.npz
-Simulations/SAGE/SAGE_GridSearch/thread_spacing_grid_MC_100.npz
-Simulations/SAGE/SAGE_GridSearch/thread_spacing_grid_MC.npz
-Simulations/SAGE/SAGE_GridSearch/thread_spacing_grid_NL_100.npz
-Simulations/SAGE/SAGE_GridSearch/thread_spacing_grid_NL.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFine_4by4rods_spacing5.0000e-02m_PF-3e-02Nspline_fps250_stepskip800_53_dx.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFine_4by4rods_spacing5.0000e-02m_PF-3e-02Nspline_fps250_stepskip800_53_dx.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFine_4by4rods_spacing5.0000e-02m_PF-3e-02Nspline_fps250_stepskip800_53.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFine_4by4rods_spacing5.0000e-02m_PF-3e-02Nspline_fps250_stepskip800_53.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFine_4by4rods_spacing6.0000e-02m_PF-3e-02Nspline_fps250_stepskip800_63_dx.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFine_4by4rods_spacing6.0000e-02m_PF-3e-02Nspline_fps250_stepskip800_63_dx.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFine_4by4rods_spacing6.0000e-02m_PF-3e-02Nspline_fps250_stepskip800_63.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFine_4by4rods_spacing6.0000e-02m_PF-3e-02Nspline_fps250_stepskip800_63.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFineCliff_67_spacing70_PF0.145773N.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFineCliff_67_spacing70_PF0.145773N.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFineCliff_188_spacing70_PF0.78125N.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFineCliff_188_spacing70_PF0.78125N.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFineCliff_198_spacing70_PF0.4N.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFineCliff_198_spacing70_PF0.4N.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFineCliff_207_spacing70_PF0.231481N.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_crosshatch_GS/ForceFineCliff_207_spacing70_PF0.231481N.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_polygon_GS/Polygon6_spacing1.2000e-01m_PF-1e-02Nspline_5Hz_fps250_stepskip800_79.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_polygon_GS/Polygon6_spacing1.2000e-01m_PF-1e-02Nspline_5Hz_fps250_stepskip800_79.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_polygon_GS/Polygon6_spacing1.2000e-01m_PF-3e-02Nspline_5Hz_fps250_stepskip800_74.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_polygon_GS/Polygon6_spacing1.2000e-01m_PF-3e-02Nspline_5Hz_fps250_stepskip800_74.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_polygon_GS/Polygon6_spacing1.3000e-01m_PF-1e-02Nspline_5Hz_fps250_stepskip800_93.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_polygon_GS/Polygon6_spacing1.3000e-01m_PF-1e-02Nspline_5Hz_fps250_stepskip800_93.npz
-Simulations/SAGE/SAGE_GridSearch/analyses_polygon_GS/Polygon6_spacing1.3000e-01m_PF-3e-02Nspline_5Hz_fps250_stepskip800_88.mp4
-Simulations/SAGE/SAGE_GridSearch/analyses_polygon_GS/Polygon6_spacing1.3000e-01m_PF-3e-02Nspline_5Hz_fps250_stepskip800_88.npz
-Simulations/SAGE/SAGE_output_reduction/0.01_ops.png
-Simulations/SAGE/SAGE_output_reduction/0.1_ops.png
-Simulations/SAGE/SAGE_output_reduction/0.05_ops.png
-Simulations/SAGE/SAGE_output_reduction/0.5_ops.png
-Simulations/SAGE/SAGE_output_reduction/0.025_ops.png
-Simulations/SAGE/SAGE_output_reduction/0.25_ops.png
-Simulations/SAGE/SAGE_output_reduction/1_ops.png
-Simulations/SAGE/SAGE_output_reduction/2.5_ops.png
-Simulations/SAGE/SAGE_output_reduction/5_ops.png
-Simulations/SAGE/SAGE_output_reduction/6by6_orig.npz
-Simulations/SAGE/SAGE_output_reduction/10_ops.png
-Simulations/SAGE/SAGE_output_reduction/25_ops.png
-Simulations/SAGE/SAGE_output_reduction/50_ops.png
-Simulations/SAGE/SAGE_output_reduction/OutputReduction_alpha0.001_6x6_100s_hors_x_vers_y.csv
-Simulations/SAGE/SAGE_output_reduction/OutputReduction_alpha0.001_6x6_100s.csv
-Simulations/SAGE/SAGE_output_reduction/OutputReduction_alpha0.01.csv
-Simulations/SAGE/SAGE_output_reduction/OutputReduction_alpha10.csv
-Simulations/SAGE/SAGE_output_reduction/OutputReduction_alpha50.csv
-Simulations/SAGE/SAGE_output_reduction/OutputReduction.csv
-Simulations/SAGE/SAGE_output_reduction/OutputReductionThreadWise_alpha0.001_6x6_100s_hors_x_vers_y.csv
-Simulations/SAGE/SAGE_output_reduction/OutputReductionThreadWise_alpha0.001_6x6_100s.csv
-Simulations/SAGE/SAGE_output_reduction/OutputReductionThreadWise_alpha0.01.csv
-Simulations/SAGE/SAGE_output_reduction/PCA.ipynb
+visualization.ipynb
 Simulations/SMASIS/all_post_proc_1sf_YM100.zip
 Simulations/SMASIS/analysis.ipynb
 Simulations/SMASIS/diffconstraints_mm_g_s_FiberSim_6rods_15sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-4e-02Nspline_k1e+09_kt1e+09_fps250_stepskip800_1.mp4
@@ -572,85 +458,6 @@ Simulations/SMASIS/constant_force/legendre_evaluation_network_density_comparison
 Simulations/SMASIS/constant_force/legendre_evaluation_network_density_comparison_YM100MPa.pdf
 Simulations/SMASIS/constant_force/memory_evaluation_network_density_comparison_force_all_changedylim.pdf
 Simulations/SMASIS/constant_force/memory_evaluation_network_density_comparison_YM100MPa.pdf
-Simulations/Tests/freq_detection_test4.ipynb
-Simulations/Tests/Test4Results/FFT_ip.png
-Simulations/Tests/Test4Results/FFT_op.png
-Simulations/Tests/Test4Results/fft_output_section_1.png
-Simulations/Tests/Test4Results/fft_output_section_2.png
-Simulations/Tests/Test4Results/fft_output_section_3.png
-Simulations/Tests/Test4Results/fft_output_section_4.png
-Simulations/Tests/Test4Results/fft_output_section_5.png
-Simulations/Tests/Test4Results/fft_output_section_6.png
-Simulations/Tests/Test4Results/fft_output_section_7.png
-Simulations/Tests/Test4Results/fft_output_section_8.png
-Simulations/Tests/Test4Results/fft_output_section_9.png
-Simulations/Tests/Test4Results/fft_output_section_10.png
-Simulations/Tests/Test4Results/test4_fft_mag_op.mat
-Simulations/Tests/Test4Results/test4_fft_phase_op.mat
-Simulations/Tests/Test4Results/mag/fft_plots_1Hz_mag.png
-Simulations/Tests/Test4Results/mag/fft_plots_2Hz_mag.png
-Simulations/Tests/Test4Results/mag/fft_plots_3Hz_mag.png
-Simulations/Tests/Test4Results/mag/fft_plots_4Hz_mag.png
-Simulations/Tests/Test4Results/mag/fft_plots_5Hz_mag.png
-Simulations/Tests/Test4Results/mag/fft_plots_6Hz_mag.png
-Simulations/Tests/Test4Results/mag/fft_plots_7Hz_mag.png
-Simulations/Tests/Test4Results/mag/fft_plots_8Hz_mag.png
-Simulations/Tests/Test4Results/mag/fft_plots_9Hz_mag.png
-Simulations/Tests/Test4Results/mag/fft_plots_10Hz_mag.png
-Simulations/Tests/Test4Results/mag_db/fft_plots_1Hz_mag_db.png
-Simulations/Tests/Test4Results/mag_db/fft_plots_2Hz_mag_db.png
-Simulations/Tests/Test4Results/mag_db/fft_plots_3Hz_mag_db.png
-Simulations/Tests/Test4Results/mag_db/fft_plots_4Hz_mag_db.png
-Simulations/Tests/Test4Results/mag_db/fft_plots_5Hz_mag_db.png
-Simulations/Tests/Test4Results/mag_db/fft_plots_6Hz_mag_db.png
-Simulations/Tests/Test4Results/mag_db/fft_plots_7Hz_mag_db.png
-Simulations/Tests/Test4Results/mag_db/fft_plots_8Hz_mag_db.png
-Simulations/Tests/Test4Results/mag_db/fft_plots_9Hz_mag_db.png
-Simulations/Tests/Test4Results/mag_db/fft_plots_10Hz_mag_db.png
-Simulations/Tests/Test4Results/phase/fft_plots_1Hz_phase.png
-Simulations/Tests/Test4Results/phase/fft_plots_2Hz_phase.png
-Simulations/Tests/Test4Results/phase/fft_plots_3Hz_phase.png
-Simulations/Tests/Test4Results/phase/fft_plots_4Hz_phase.png
-Simulations/Tests/Test4Results/phase/fft_plots_5Hz_phase.png
-Simulations/Tests/Test4Results/phase/fft_plots_6Hz_phase.png
-Simulations/Tests/Test4Results/phase/fft_plots_7Hz_phase.png
-Simulations/Tests/Test4Results/phase/fft_plots_8Hz_phase.png
-Simulations/Tests/Test4Results/phase/fft_plots_9Hz_phase.png
-Simulations/Tests/Test4Results/phase/fft_plots_10Hz_phase.png
-Simulations/Tests 0 to 2 10 sec/legendre_sum_eval_test0to2.png
-Simulations/Tests 0 to 2 10 sec/memory_sum_eval_test0to2.png
-Simulations/Tests 0 to 2 10 sec/test0_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.mp4
-Simulations/Tests 0 to 2 10 sec/test0_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.npz
-Simulations/Tests 0 to 2 10 sec/test0_legendre_eval.png
-Simulations/Tests 0 to 2 10 sec/test0_memory_eval.png
-Simulations/Tests 0 to 2 10 sec/test0.npz
-Simulations/Tests 0 to 2 10 sec/test1_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.mp4
-Simulations/Tests 0 to 2 10 sec/test1_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.npz
-Simulations/Tests 0 to 2 10 sec/test1_legendre_eval.png
-Simulations/Tests 0 to 2 10 sec/test1_memory_eval.png
-Simulations/Tests 0 to 2 10 sec/test1.npz
-Simulations/Tests 0 to 2 10 sec/test2_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.mp4
-Simulations/Tests 0 to 2 10 sec/test2_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.npz
-Simulations/Tests 0 to 2 10 sec/test2_legendre_eval.png
-Simulations/Tests 0 to 2 10 sec/test2_memory_eval.png
-Simulations/Tests 0 to 2 10 sec/test2.npz
-Simulations/sine_random_omega/varying_sine_4rods.npz
-Simulations/sine_random_omega/varying_sine_data_issuediffconstraints_mm_g_s_FiberSim_4rods_0sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.npz
-Simulations/sine_random_omega/varying_sine_data_issuediffconstraints_mm_g_s_FiberSim_4rods_1sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.npz
-Simulations/sine_random_omega/varying_sine_legendre.png
-Simulations/sine_random_omega/varying_sine_memory.png
-Simulations/sine_random_omega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_1sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.mp4
-Simulations/sine_random_omega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_1sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.npz
-Simulations/sine_random_omega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_10sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.mp4
-Simulations/sine_random_omega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_10sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.npz
-Simulations/unit_scaling_comparisons/comparison of unit scaling.ipynb
-Simulations/unit_scaling_comparisons/mm_g_s_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.npz
-Simulations/unit_scaling_comparisons/mm_g_s_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.mp4
-Simulations/unit_scaling_comparisons/mm_g_s_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.npz
-Simulations/unit_scaling_comparisons/mm_mg_ms_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.mp4
-Simulations/unit_scaling_comparisons/mm_mg_ms_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.npz
-Simulations/unit_scaling_comparisons/mm_mg_ms_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.mp4
-Simulations/unit_scaling_comparisons/mm_mg_ms_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.npz
 Experiments/Magnetic/magnetic_motor_backup.py
 Experiments/Magnetic/magnetic_motor_control_1.py
 Experiments/Magnetic/magnetic_real_time_plotting.py
@@ -732,3 +539,96 @@ Simulations/SAGE/GridSearch/ThreadSpacing/Data_NL/*.npz
 Simulations/SAGE/GridSearch/ForceSpacing/force_spacing_grid.ipynb
 *.blend
 *.blend1
+# Archive
+Simulations/legendre_sum_eval_test0to2.png
+Simulations/memory_sum_eval_test0to2.png
+Simulations/Tests/*.png
+Simulations/Tests/*.mat
+Simulations/Tests/*.mp4
+Simulations/Tests/*.npz
+Simulations/OldSimFiles/old_spider_web/SpiderWebNoGym.py
+Simulations/OldSimFiles/old_spider_web/SpiderWebNoGymBoundary.py
+Simulations/OldSimFiles/old_spider_web/SpiderWebNoGymRadial.py
+Simulations/Tests/freq_detection_test4.ipynb
+Simulations/Tests/Test4Results/FFT_ip.png
+Simulations/Tests/Test4Results/FFT_op.png
+Simulations/Tests/Test4Results/fft_output_section_1.png
+Simulations/Tests/Test4Results/fft_output_section_2.png
+Simulations/Tests/Test4Results/fft_output_section_3.png
+Simulations/Tests/Test4Results/fft_output_section_4.png
+Simulations/Tests/Test4Results/fft_output_section_5.png
+Simulations/Tests/Test4Results/fft_output_section_6.png
+Simulations/Tests/Test4Results/fft_output_section_7.png
+Simulations/Tests/Test4Results/fft_output_section_8.png
+Simulations/Tests/Test4Results/fft_output_section_9.png
+Simulations/Tests/Test4Results/fft_output_section_10.png
+Simulations/Tests/Test4Results/test4_fft_mag_op.mat
+Simulations/Tests/Test4Results/test4_fft_phase_op.mat
+Simulations/Tests/Test4Results/mag/fft_plots_1Hz_mag.png
+Simulations/Tests/Test4Results/mag/fft_plots_2Hz_mag.png
+Simulations/Tests/Test4Results/mag/fft_plots_3Hz_mag.png
+Simulations/Tests/Test4Results/mag/fft_plots_4Hz_mag.png
+Simulations/Tests/Test4Results/mag/fft_plots_5Hz_mag.png
+Simulations/Tests/Test4Results/mag/fft_plots_6Hz_mag.png
+Simulations/Tests/Test4Results/mag/fft_plots_7Hz_mag.png
+Simulations/Tests/Test4Results/mag/fft_plots_8Hz_mag.png
+Simulations/Tests/Test4Results/mag/fft_plots_9Hz_mag.png
+Simulations/Tests/Test4Results/mag/fft_plots_10Hz_mag.png
+Simulations/Tests/Test4Results/mag_db/fft_plots_1Hz_mag_db.png
+Simulations/Tests/Test4Results/mag_db/fft_plots_2Hz_mag_db.png
+Simulations/Tests/Test4Results/mag_db/fft_plots_3Hz_mag_db.png
+Simulations/Tests/Test4Results/mag_db/fft_plots_4Hz_mag_db.png
+Simulations/Tests/Test4Results/mag_db/fft_plots_5Hz_mag_db.png
+Simulations/Tests/Test4Results/mag_db/fft_plots_6Hz_mag_db.png
+Simulations/Tests/Test4Results/mag_db/fft_plots_7Hz_mag_db.png
+Simulations/Tests/Test4Results/mag_db/fft_plots_8Hz_mag_db.png
+Simulations/Tests/Test4Results/mag_db/fft_plots_9Hz_mag_db.png
+Simulations/Tests/Test4Results/mag_db/fft_plots_10Hz_mag_db.png
+Simulations/Tests/Test4Results/phase/fft_plots_1Hz_phase.png
+Simulations/Tests/Test4Results/phase/fft_plots_2Hz_phase.png
+Simulations/Tests/Test4Results/phase/fft_plots_3Hz_phase.png
+Simulations/Tests/Test4Results/phase/fft_plots_4Hz_phase.png
+Simulations/Tests/Test4Results/phase/fft_plots_5Hz_phase.png
+Simulations/Tests/Test4Results/phase/fft_plots_6Hz_phase.png
+Simulations/Tests/Test4Results/phase/fft_plots_7Hz_phase.png
+Simulations/Tests/Test4Results/phase/fft_plots_8Hz_phase.png
+Simulations/Tests/Test4Results/phase/fft_plots_9Hz_phase.png
+Simulations/Tests/Test4Results/phase/fft_plots_10Hz_phase.png
+Simulations/Tests 0 to 2 10 sec/legendre_sum_eval_test0to2.png
+Simulations/Tests 0 to 2 10 sec/memory_sum_eval_test0to2.png
+Simulations/Tests 0 to 2 10 sec/test0_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.mp4
+Simulations/Tests 0 to 2 10 sec/test0_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.npz
+Simulations/Tests 0 to 2 10 sec/test0_legendre_eval.png
+Simulations/Tests 0 to 2 10 sec/test0_memory_eval.png
+Simulations/Tests 0 to 2 10 sec/test0.npz
+Simulations/Tests 0 to 2 10 sec/test1_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.mp4
+Simulations/Tests 0 to 2 10 sec/test1_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.npz
+Simulations/Tests 0 to 2 10 sec/test1_legendre_eval.png
+Simulations/Tests 0 to 2 10 sec/test1_memory_eval.png
+Simulations/Tests 0 to 2 10 sec/test1.npz
+Simulations/Tests 0 to 2 10 sec/test2_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.mp4
+Simulations/Tests 0 to 2 10 sec/test2_6by6rods_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+08Pa_PF-2e-01Nspline_fps250_stepskip800.npz
+Simulations/Tests 0 to 2 10 sec/test2_legendre_eval.png
+Simulations/Tests 0 to 2 10 sec/test2_memory_eval.png
+Simulations/Tests 0 to 2 10 sec/test2.npz
+Simulations/sine_random_omega/varying_sine_4rods.npz
+Simulations/sine_random_omega/varying_sine_data_issuediffconstraints_mm_g_s_FiberSim_4rods_0sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.npz
+Simulations/sine_random_omega/varying_sine_data_issuediffconstraints_mm_g_s_FiberSim_4rods_1sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.npz
+Simulations/sine_random_omega/varying_sine_legendre.png
+Simulations/sine_random_omega/varying_sine_memory.png
+Simulations/sine_random_omega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_1sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.mp4
+Simulations/sine_random_omega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_1sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nspline_k1e+09_kt1e+09_fps250_stepskip800_0.npz
+Simulations/sine_random_omega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_10sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.mp4
+Simulations/sine_random_omega/varying_sine_trialdiffconstraints_mm_g_s_FiberSim_4rods_10sec_L5.00e-01m_R1.00e-03m_dx10mm_YM1.00e+07Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nvarying_sine_k1e+09_kt1e+09_fps250_stepskip800_0.npz
+# Polygon
+Simulations/Polygon/*.mp4
+Simulations/Polygon/*.npz
+# SimToReal
+Simulations/unit_scaling_comparisons/comparison of unit scaling.ipynb
+Simulations/unit_scaling_comparisons/mm_g_s_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.npz
+Simulations/unit_scaling_comparisons/mm_g_s_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.mp4
+Simulations/unit_scaling_comparisons/mm_g_s_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip800.npz
+Simulations/unit_scaling_comparisons/mm_mg_ms_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.mp4
+Simulations/unit_scaling_comparisons/mm_mg_ms_FiberSim_1rods_1sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping10_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.npz
+Simulations/unit_scaling_comparisons/mm_mg_ms_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.mp4
+Simulations/unit_scaling_comparisons/mm_mg_ms_FiberSim_1rods_2sec_L5.00e-01m_R2.25e-04m_dx20mm_YM5.00e+06Pa_Density1.00e+03kgmm-3_Damping5_TF1e-02N_PF-5e-03Nconstant_k1e+09_kt1e+09_fps250_stepskip80000.npz
