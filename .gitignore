@@ -540,6 +540,9 @@ Simulations/SAGE/GridSearch/ThreadSpacing/Data_MC_50/*.npz
 Simulations/SAGE/GridSearch/ThreadSpacing/Data_NL_50/*.npz
 Simulations/SAGE/GridSearch/ThreadSpacing/Data_NL/*.npz
 Simulations/SAGE/GridSearch/ForceSpacing/force_spacing_grid.ipynb
+Simulations/SAGE/GridSearch/TensionSpacing/*.mp4
+Simulations/SAGE/GridSearch/TensionSpacing/*.npz
+Simulations/SAGE/IncreasingDensity/Data/*.npz
 Experiments/SAGE/4by4_bokun/*
 Experiments/SAGE/6by6_bokun/*
 Experiments/SAGE/4by4--Advait/*
