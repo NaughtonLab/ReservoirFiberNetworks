@@ -38,9 +38,6 @@ def get_sim_name_and_update_data_frame(grid_data, case_name, idx, update_df):
 
             if update_df:
                 df.at[idx, 'num_threads'] = num_horizontal_threads
-                df.at[idx, 'spacing(mm)'] = spacing
-                df.at[idx, 'length(mm)'] = thread_length*1e3
-                df.at[idx, 'force_mag(N)'] = point_force_mag
 
         case "GS_Force_Spacing":
 
@@ -138,9 +135,13 @@ def get_sim_name_and_update_data_frame(grid_data, case_name, idx, update_df):
 if __name__ == "__main__":
     
     fps = 250
-    case_name = "GS_Thread_Spacing_NL"
+    case_name = "Increasing_Density"
     regenerate_ip = True
     update_df = False
+    n_splits = 10
+    CV = True
+    type_CV_nonlin = 'KFold'
+    type_CV_mem = 'TimeSeriesSplit'
 
     leg_max_order = 10
     max_time_back_seconds = 1
@@ -150,120 +151,28 @@ if __name__ == "__main__":
         case "Increasing_Density":
             folder = os.path.join(os.getcwd(), 'Simulations/SAGE/IncreasingDensity')
             path = os.path.join(folder, 'Data', '')
-            csv_name = 'IncreasingDensityEvaluation'
+            csv_name = f'IncreasingDensity_alpha_sweep_{n_splits}CV'
 
             regressor = "Rid"
             test_size = 0.25
-            alpha = 1e-2
+            alpha_list = [1e-4, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2]
 
             grid = np.load(f'{folder}/increasing_density_list.npz', allow_pickle=True)
             grid = grid['grid']
 
             idx_list = [i for i in range(6)]
 
-            columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test']
-            # The CSV file exists in the following format
-            # columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity', 'memory', 'nonlinearity_cap', 'memory_cap']
-
-        case "GS_Force_Spacing":
-            folder = os.path.join(os.getcwd(), 'Simulations/SAGE/GridSearch/ForceSpacing')
-            path = os.path.join(folder, 'Data', '')
-            csv_name = 'GSEvaluation_force_100sec_cap'
-
-            regressor = "Rid"
-            test_size = 0.25
-            alpha = 1e-2
-
-            grid_1 = np.load(f'{folder}/force_spacing_grid.npz', allow_pickle=True)
-            grid_1 = grid_1['grid']
-
-            grid_2 = np.load(f'{folder}/force_spacing_grid_2.npz', allow_pickle=True)
-            grid_2 = grid_2['grid']
-
-            idx_list = [i for i in range(252)]
-
-            columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test']
-
-        case "Force_Sweep":
-            folder = os.path.join(os.getcwd(), 'Simulations/SAGE/ForceSweep')
-            path = os.path.join(folder, 'Data', '')
-
-            csv_name = 'ForceCliffSweep_evaluation'
-
-            grid = np.load(f'{folder}/forces_sweep.npz', allow_pickle=True)
-            grid = grid['sweep']
-
-            idx_list = [i for i in range(9)]
-
-            columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test']
-            # The CSV file exists in the following format
-            # columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity', 'memory']
-            
-        case "GS_Tension_Spacing":
-            folder = os.path.join(os.getcwd(), 'Simulations/SAGE/GridSearch/TensionSpacing')
-            path = os.path.join(folder, 'Data', '')
-            csv_name = 'GSEvaluation_tension_cap'
-
-            regressor = "Rid"
-            test_size = 0.25
-            alpha = 1e-2
-
-            grid = np.load(f'{folder}/tension_spacing_force_grid_new.npz', allow_pickle=True)
-            grid = grid['grid']
-
-            idx_list = [i for i in range(36)]
-
-            columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'tension(N)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test']
-
-        case "GS_Thread_Spacing_NL":
-            folder = os.path.join(os.getcwd(), 'Simulations/SAGE/GridSearch/ThreadSpacing')
-            path = os.path.join(folder, 'Data_NL', '')
-            csv_name = os.path.join(folder, 'GSEvaluation_NL_cap')
-
-            regressor = "Rid"
-            test_size = 0.25
-            alpha = 0.01
-
-            grid = np.load(os.path.join(folder, 'thread_spacing_grid_NL.npz'), allow_pickle=True)
-            grid = grid['grid']
-
-            idx_list = [i for i in range(0, 84)]
-
-            columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test']
-
-        case "GS_Thread_Spacing_MC":
-            folder = os.path.join(os.getcwd(), 'Simulations/SAGE/GridSearch/ThreadSpacing')
-            path = os.path.join(folder, 'Data_MC', '')
-            csv_name = os.path.join(folder, 'GSEvaluation_MC_cap')
-            
-            regressor = "Rid"
-            test_size = 0.25
-            alpha = 1e-2
-
-            grid = np.load(os.path.join(folder, 'thread_spacing_grid_MC.npz'), allow_pickle=True)
-            grid = grid['grid']
-
-            idx_list = [i for i in range(0, 84)]
-
-            columns = ['num_threads', 'spacing(mm)', 'length(mm)', 'force_mag(N)', 'nonlinearity train', 'memory train', 'nonlinearity test', 'memory test']
+            columns = ['num_threads', 'alpha', 'nonlinearity train', 'nonlinearity test', 'memory train', 'memory test']
 
     if os.path.exists(f"{csv_name}.csv"):
         df = pd.read_csv(f"{csv_name}.csv")
     else:
         df = pd.DataFrame(columns=columns)
     
-
+    j = 0
     for idx in idx_list:
-        if case_name == "GS_Force_Spacing":
-            if idx < 112:
-                grid = grid_1
-                idx_temp = idx
-            else:
-                grid = grid_2
-                idx_temp = idx - 112
-            grid_data = grid[idx_temp]
-        else:
-            grid_data = grid[idx]
+        record_dict = {}
+        grid_data = grid[idx]
 
         sim_name, num_horizontal_threads, num_vertical_threads, df = get_sim_name_and_update_data_frame(grid_data, case_name, idx, update_df)
         sim_ip_data, sim_op_data, sim_time_data = load_simulation_data(file_path = f"{path}{sim_name}",
@@ -280,66 +189,66 @@ if __name__ == "__main__":
         time_data = sim_time_data[0]
 
         ### Uncomment the below lines to load previously evaluated data that needs to be re-evaluated to avoid reloading the simulation data and redoing the preprocessing steps. This is useful when we want to change the parameters of the evaluation (e.g., regressor, test size, alpha) and want to quickly get the new evaluation results without having to wait for the data loading and preprocessing steps.
-        # data = np.load(f"{path}{idx}_eval.npz", allow_pickle=True)
-        # input_data = data['input_data']
-        # output_data = data['output_data']
-        # time_data = data['time_data']
-        # leg_capacity_train_list = data['nonlinearity'][0]
-        # mem_capacity_train_list = data['memory'][0]
-        # leg_capacity_test_list = data['nonlinearity'][1]
-        # mem_capacity_test_list = data['memory'][1]
+        # data = np.load(f"{path}{idx}_eval_{n_splits}_alphaCV.npz", allow_pickle=True)
+
+        for alpha in alpha_list:
         
-        if not np.isnan(input_data).any():
-            print(idx)
+            if not np.isnan(input_data).any():
+                print(idx)
 
-            input_data = -1 + (input_data - np.min(input_data)) / (np.max(input_data) - np.min(input_data)) * (1 - (-1))
+                input_data = -1 + (input_data - np.min(input_data)) / (np.max(input_data) - np.min(input_data)) * (1 - (-1))
 
-            print(input_data.shape, output_data.shape)
+                print(input_data.shape, output_data.shape)
 
-            # Nonlinearity testing
-            leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list = nonlinearity_testing(input_data, output_data, leg_max_order, regressor, test_size, alpha)
-            
-            # Memory testing
-            mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list = memory_testing(input_data, output_data, max_timesteps_back, regressor, test_size, alpha)
+                # Nonlinearity testing
+                leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list = nonlinearity_testing(input_data, output_data, leg_max_order, regressor, test_size, alpha, CV, type_CV_nonlin, n_splits)
+                
+                # Memory testing
+                mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list = memory_testing(input_data, output_data, max_timesteps_back, regressor, test_size, alpha, CV, type_CV_mem, n_splits)
 
-            # Nonlinearity-Memory matrix
-            capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix = nonlinearity_memory_matrix(input_data, output_data, leg_max_order, max_timesteps_back, regressor, test_size, alpha)
+                onc_train = sum(leg_capacity_train_list)/len(leg_capacity_train_list)
+                omc_train = sum(mem_capacity_train_list)/len(mem_capacity_train_list)
+                onc_test = sum(leg_capacity_test_list)/len(leg_capacity_test_list)
+                omc_test = sum(mem_capacity_test_list)/len(mem_capacity_test_list)
 
-            onc_train = sum(leg_capacity_train_list)/len(leg_capacity_train_list)
-            omc_train = sum(mem_capacity_train_list)/len(mem_capacity_train_list)
-            onc_test = sum(leg_capacity_test_list)/len(leg_capacity_test_list)
-            omc_test = sum(mem_capacity_test_list)/len(mem_capacity_test_list)
+            else:
+                leg_capacity_train_list = np.nan
+                leg_R2_train_list = np.nan
+                mem_capacity_train_list = np.nan
+                mem_R2_train_list = np.nan
+                capacity_train_matrix = np.nan
+                R2_train_matrix = np.nan
+                leg_capacity_test_list = np.nan
+                leg_R2_test_list = np.nan
+                mem_capacity_test_list = np.nan
+                mem_R2_test_list = np.nan
+                capacity_test_matrix = np.nan
+                R2_test_matrix = np.nan
+                onc_train = np.nan
+                omc_train = np.nan
+                onc_test = np.nan
+                omc_test = np.nan
 
-        else:
-            leg_capacity_train_list = np.nan
-            leg_R2_train_list = np.nan
-            mem_capacity_train_list = np.nan
-            mem_R2_train_list = np.nan
-            capacity_train_matrix = np.nan
-            R2_train_matrix = np.nan
-            leg_capacity_test_list = np.nan
-            leg_R2_test_list = np.nan
-            mem_capacity_test_list = np.nan
-            mem_R2_test_list = np.nan
-            capacity_test_matrix = np.nan
-            R2_test_matrix = np.nan
-            onc_train = np.nan
-            omc_train = np.nan
-            onc_test = np.nan
-            omc_test = np.nan
+            # Save results in dataframe
+            df.at[j, 'alpha'] = alpha
+            df.at[j, 'nonlinearity train'] = onc_train
+            df.at[j, 'memory train'] = omc_train
+            df.at[j, 'nonlinearity test'] = onc_test
+            df.at[j, 'memory test'] = omc_test
 
-        # Save results in dataframe
-        df.at[idx, 'nonlinearity train'] = onc_train
-        df.at[idx, 'memory train'] = omc_train
-        df.at[idx, 'nonlinearity test'] = onc_test
-        df.at[idx, 'memory test'] = omc_test
+            j += 1
 
-        np.savez(f"{path}{idx}_eval.npz", input_data=input_data, 
+            record_dict[alpha] = (leg_capacity_train_list, leg_capacity_test_list, mem_capacity_train_list, mem_capacity_test_list)
+
+        # Please note that the actual files with suffix "_{n_splits}_alphaCV" in the Data folder do not contain input, output, and time data. 
+        # They only contain the record_dict with the evaluation results. These evaluation results can be accessed using the following code:
+        # data = np.load(f"{path}{idx}_eval_{n_splits}_alphaCV.npz", allow_pickle=True)
+        # data = data['npsavez_dict'].item()
+        # metrics = data[f'{alpha}']
+        np.savez(f"{path}{idx}_eval_{n_splits}_alphaCV.npz", input_data=input_data, 
                 output_data=output_data, 
                 time_data=time_data, 
-                nonlinearity=[leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list], 
-                memory=[mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list], 
-                heatmap=[capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix])
+                record_dict=record_dict)
         
         print(idx, "eval done.")
 
