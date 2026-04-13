@@ -5,6 +5,9 @@
 *.zip
 *.pptx
 *.pdf
+*.blend
+*.blend1
+*.jpg
 visualization.ipynb
 Simulations/SMASIS/all_post_proc_1sf_YM100.zip
 Simulations/SMASIS/analysis.ipynb
@@ -537,8 +540,15 @@ Simulations/SAGE/GridSearch/ThreadSpacing/Data_MC_50/*.npz
 Simulations/SAGE/GridSearch/ThreadSpacing/Data_NL_50/*.npz
 Simulations/SAGE/GridSearch/ThreadSpacing/Data_NL/*.npz
 Simulations/SAGE/GridSearch/ForceSpacing/force_spacing_grid.ipynb
-*.blend
-*.blend1
+Experiments/SAGE/4by4_bokun/*
+Experiments/SAGE/6by6_bokun/*
+Experiments/SAGE/4by4--Advait/*
+Experiments/SAGE/6by6--Advait/*
+Experiments/SAGE/*.csv
+Experiments/SAGE/4by4/*.npz
+Experiments/SAGE/6by6/*.npz
+Experiments/SAGE/4by4/Videos/*.mp4
+Experiments/SAGE/6by6/Videos/*.mp4
 # Archive
 Simulations/legendre_sum_eval_test0to2.png
 Simulations/memory_sum_eval_test0to2.png
