@@ -390,7 +390,7 @@ class ArduinoSensing:
             except Exception:
                 pass
 
-        csv_path = f"{outstem}_sensor.csv"
+        csv_path = f"{outstem}/{self.config.EXP_NAME}_sensor.csv"
         with open(csv_path, "w", newline="") as f:
             w = csv.writer(f)
             w.writerow(labels)
@@ -400,8 +400,8 @@ class ArduinoSensing:
         print(f"Saved sensor CSV: {csv_path}")
 
         if live_plot:
-            plt.savefig(f"{outstem}_sensor.png", dpi=300)
-            print(f"Saved sensor PNG: {outstem}_sensor.png")
+            plt.savefig(f"{outstem}/{self.config.EXP_NAME}_sensor.png", dpi=300)
+            print(f"Saved sensor PNG: {outstem}/{self.config.EXP_NAME}_sensor.png")
 
         data = {"sensor_t_s": sensor_t, "host_t_s": host_t}
         for i, label in enumerate(labels[2:]):

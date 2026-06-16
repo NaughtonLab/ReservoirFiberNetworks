@@ -39,6 +39,7 @@ class SensingConfig:
             self.DURATION_MS = duration_ms
         self.channels = kwargs.get("channels", self.channels)
         self.EXP_NAME = kwargs.get("EXP_NAME", self.EXP_NAME)
+        self.OUTPUT_STEM = os.path.join(self.BASE_DIR, self.EXP_NAME)
 
 @dataclass
 class MotorControlConfig:
@@ -136,7 +137,7 @@ def run_synchronized_experiment(sensor, motor, motor_speed_rpm, goal_positions, 
         if "error" in sensor_error:
             raise sensor_error["error"]
 
-        outstem = pathlib.Path(sensor.config.OUTPUT_STEM)
+        outstem = os.path.join(sensor.config.OUTPUT_STEM, sensor.config.EXP_NAME)
         motor_csv_path = f"{outstem}_motor.csv"
         motor_df.to_csv(motor_csv_path, index=False)
         print(f"Saved motor CSV: {motor_csv_path}")
@@ -230,7 +231,7 @@ if __name__ == "__main__":
         axs[4].set_ylabel("Voltage (V)")
         axs[4].set_title("Pickup 4 vs. Time")
 
-        plt.savefig(f"{sensor_config.OUTPUT_STEM}_combined_plot.png")
+        plt.savefig(f"{sensor_config.OUTPUT_STEM}/{sensor_config.EXP_NAME}_combined_plot.png")
         plt.show()
     else:
         print("Ok—skipping run.")
