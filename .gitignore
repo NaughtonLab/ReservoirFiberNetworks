@@ -26,10 +26,13 @@ Simulations/SAGE/**/*
 Simulations/SAGE/**/**/*
 !Simulations/SAGE/**/**/*.ipynb
 !Simulations/SAGE/**/**/*.py
-!Simulations/SAGE/**/**/*.npz
 Simulations/SAGE/**/**/**/*
 !Simulations/SAGE/**/**/**/*.ipynb
 !Simulations/SAGE/**/**/**/*.py
+!Simulations/SAGE/GridSearch/ForceSpacing/force_spacing_grid*.npz
+!Simulations/SAGE/GridSearch/ForceSweep/force_sweep*.npz
+!Simulations/SAGE/GridSearch/ThreadSpacing/thread_spacing_grid*.npz
+!Simulations/SAGE/IncreasingDensity/increasing_density*.npz
 Experiments/SAGE/4by4_bokun/*
 Experiments/SAGE/6by6_bokun/*
 Experiments/SAGE/4by4--Advait/*
