@@ -353,7 +353,7 @@ class fiber_simulation():
             spline_list = []
 
             for j in range(len(vib_thread_idx_list)):
-                y_sample = np.random.uniform(-1,1, size=sample_time*self.sample_freq+1)
+                y_sample = np.random.uniform(-1, 1, size=sample_time*self.sample_freq+1)
                 y_sample[0] = 0.0    
                 spline = CubicSpline(x_sample, y_sample)
 
