@@ -1,0 +1,31 @@
+name: fiber_network_venv_conda
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      # torch/torchvision are CUDA 13.2 builds, so they come from the PyTorch index
+      - --extra-index-url https://download.pytorch.org/whl/cu132
+
+      # Core pins (pyelastica 0.3.1.post1 needs numba 0.55.x, which needs numpy < 1.23)
+      - pyelastica==0.3.1.post1
+      - numba==0.55.2
+      - llvmlite==0.38.1
+      - numpy==1.22.4
+      - setuptools<81            # numba 0.55 / llvmlite 0.38 import pkg_resources, removed in setuptools 81+
+
+      # Segmentation / deep learning
+      - cellpose==4.2.1.1
+      - torch==2.14.1+cu132
+      - torchvision==0.29.1+cu132
+      - opencv-python-headless==4.11.0.86   # headless, to match cellpose (do not install opencv-python too)
+
+      # Analysis (versions capped by numpy 1.22.4)
+      - scikit-image==0.22.0
+      - scikit-learn==1.7.2
+      - pandas==2.3.3
+      - scipy==1.13.1
+      - matplotlib==3.8.4
+      - pyparsing<3.3
+      - pyqtgraph<0.14
