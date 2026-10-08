@@ -56,7 +56,7 @@ if __name__ == '__main__':
         'VIDEO': True,
 
         'scaling_type': scaling_type,
-        'loc': '.Simulations/SMASIS/',
+        'loc': './Simulations/SMASIS/',
         'file_type': 'npz'
     }
 

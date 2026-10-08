@@ -21,7 +21,7 @@ def mp_handler(params_list):
     p.map(wrapper_launcher, params_list)
 
 if __name__ == '__main__':
-    parent_folder = "Simulations/SAGE/GridSearch/Force_Spacing"
+    parent_folder = "Simulations/SAGE/GridSearch/ForceSpacing"
 
     parser = argparse.ArgumentParser(description="Script that configures and launches fiber_simulation for Force-Spacing Grid Search")
 
