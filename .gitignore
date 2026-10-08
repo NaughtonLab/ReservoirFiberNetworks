@@ -20,10 +20,16 @@ Experiments/Magnetic/run_magnetic_experiment.py
 Simulatoins/SAGE/*
 !Simulations/SAGE/*.ipynb
 !Simulations/SAGE/*.py
+Simulations/SAGE/**/*
 !Simulations/SAGE/**/*.ipynb
 !Simulations/SAGE/**/*.py
+Simulations/SAGE/**/**/*
 !Simulations/SAGE/**/**/*.ipynb
 !Simulations/SAGE/**/**/*.py
+!Simulations/SAGE/**/**/*.npz
+Simulations/SAGE/**/**/**/*
+!Simulations/SAGE/**/**/**/*.ipynb
+!Simulations/SAGE/**/**/**/*.py
 Experiments/SAGE/4by4_bokun/*
 Experiments/SAGE/6by6_bokun/*
 Experiments/SAGE/4by4--Advait/*
