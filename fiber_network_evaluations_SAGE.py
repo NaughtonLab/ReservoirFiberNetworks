@@ -70,6 +70,8 @@ def get_sim_name_and_update_data_frame(grid_data, case_name, idx, update_df):
             skip = 800
             suffix = f'spacing{spacing:.4e}m_PF{-point_force_mag:.0e}Nspline_fps250_stepskip{skip}'
 
+            sim_name = f'{num_horizontal_threads}by{num_vertical_threads}rods_{suffix}_{idx}'
+
             if update_df:
                 df.at[idx, 'num_threads'] = num_horizontal_threads
                 df.at[idx, 'spacing(mm)'] = spacing*1e3
@@ -150,7 +152,7 @@ if __name__ == "__main__":
         case "Increasing_Density":
             folder = os.path.join(os.getcwd(), 'Simulations/SAGE/IncreasingDensity')
             path = os.path.join(folder, 'Data', '')
-            csv_name = 'IncreasingDensityEvaluation'
+            csv_name = os.path.join(folder, 'IncreasingDensityEvaluation')
 
             regressor = "Rid"
             test_size = 0.25
@@ -168,7 +170,7 @@ if __name__ == "__main__":
         case "GS_Force_Spacing":
             folder = os.path.join(os.getcwd(), 'Simulations/SAGE/GridSearch/ForceSpacing')
             path = os.path.join(folder, 'Data', '')
-            csv_name = 'GSEvaluation_force_100sec_cap'
+            csv_name = os.path.join(folder, 'GSEvaluation_force_100sec_cap')
 
             regressor = "Rid"
             test_size = 0.25
@@ -187,8 +189,7 @@ if __name__ == "__main__":
         case "Force_Sweep":
             folder = os.path.join(os.getcwd(), 'Simulations/SAGE/ForceSweep')
             path = os.path.join(folder, 'Data', '')
-
-            csv_name = 'ForceCliffSweep_evaluation'
+            csv_name = os.path.join(folder, 'ForceCliffSweep_evaluation')
 
             grid = np.load(f'{folder}/forces_sweep.npz', allow_pickle=True)
             grid = grid['sweep']
@@ -202,7 +203,7 @@ if __name__ == "__main__":
         case "GS_Tension_Spacing":
             folder = os.path.join(os.getcwd(), 'Simulations/SAGE/GridSearch/TensionSpacing')
             path = os.path.join(folder, 'Data', '')
-            csv_name = 'GSEvaluation_tension_cap'
+            csv_name = os.path.join(folder, 'GSEvaluation_tension_cap')
 
             regressor = "Rid"
             test_size = 0.25
