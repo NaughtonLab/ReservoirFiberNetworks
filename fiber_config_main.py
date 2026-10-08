@@ -37,7 +37,7 @@ if __name__ == '__main__':
         'point_force_mag': -5e-3, #-0.2 # 1 N = kg m/s2 --> 1e6 g mm/s2 --> 1e3 mg mm /ms2 
         'SPREAD_PF': True, # whether the force should be a gaussian spread across 5 nodes or just applied at a single point
         'TYPE_PF': "spline", # type of force to be applied 
-        'sample_freq_pf': 5, # Sampling frequency for random point force
+        'sample_freq': 5, # Sampling frequency for random point force
 
         'damping_constant': 10, 
         'filter_order': 6,
