@@ -1,23 +1,34 @@
 import os
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.metrics import mean_squared_error, r2_score
 from scipy.special import legendre
-import matplotlib.pyplot as plt
 
-def __fit__(x_train, x_test, y_train, y_test, clf, y, plot=False):
-    y2 = (1/len(y)) * np.sum((y-np.mean(y))**2)
+'''
+Single train/test split evaluation of the reservoir (nonlinearity, memory and the combined
+nonlinearity-memory matrix). Cross-validated versions of nonlinearity_testing and memory_testing
+live in utils/evaluate_cv.py and are used when CV=True is passed.
+'''
 
+def get_regressor(regressor, alpha):
+    if regressor == "Lin":
+        ### Linear Regression
+        return LinearRegression()
+    elif regressor == "Rid":
+        ### Ridge Regression
+        return Ridge(alpha=alpha)
+    raise ValueError(f"Unknown regressor '{regressor}'. Use 'Lin' or 'Rid'.")
+
+def __fit__(x_train, x_test, y_train, y_test, clf, y, return_predictions=False):
     # Training
     clf.fit(x_train, y_train)
     y_train_pred = clf.predict(x_train)
-    
+
     idx = np.where(abs(y_train_pred) > 1)
     y_train_pred[idx] = np.mean(y)
     y_train[idx, 0] = np.mean(y)
-    
+
     y2_train = (1/len(y_train)) * np.sum((y_train-np.mean(y_train))**2)
 
     MSE_train = mean_squared_error(y_true=y_train, y_pred=y_train_pred)
@@ -46,137 +57,79 @@ def __fit__(x_train, x_test, y_train, y_test, clf, y, plot=False):
     if capacity_train < 0:
         capacity_train = 0
 
-    if plot:
-        print("MSE", MSE_train, MSE_test, "y2", y2, "capacity", capacity_train, capacity_test)
-        return capacity_train, capacity_test, R2_train, R2_test, y_train, y_train_pred, y_test, y_test_pred
-    else:
-        return capacity_train, capacity_test, R2_train, R2_test
+    if return_predictions:
+        return capacity_train, capacity_test, R2_train, R2_test, y_test, y_test_pred
+    return capacity_train, capacity_test, R2_train, R2_test
 
-def nonlinearity_testing(input, output, leg_max_order, regressor, test_size, alpha, plot=False, CV=False, **kwargs):
-    if regressor == "Lin":
-        ### Linear Regression
-        clf = LinearRegression()
-    elif regressor == "Rid":
-        ### Ridge Regression
-        clf = Ridge(alpha=alpha)
-    else:
-        print("Please specify the regressor")
+def save_predictions(file_path, y_test_list, y_test_pred_list, labels):
+    '''
+    Saves the test targets and predictions of every Legendre order / delay in one npz:
+    keys y_test_<label> and y_test_pred_<label> (e.g. y_test_leg3, y_test_pred_delay10), both 1-D.
+    y_test is the target after the |pred|>1 clipping in __fit__, i.e. what the scores were computed on.
+    '''
+    os.makedirs(os.path.dirname(os.path.abspath(file_path)), exist_ok=True)
+    arrays = {}
+    for label, y_test, y_test_pred in zip(labels, y_test_list, y_test_pred_list):
+        arrays[f'y_test_{label}'] = np.ravel(y_test)
+        arrays[f'y_test_pred_{label}'] = np.ravel(y_test_pred)
+    np.savez(file_path, **arrays)
+    print("Predictions saved in", file_path)
 
+def nonlinearity_testing(input, output, leg_max_order, regressor, test_size, alpha, *, CV=False, type_CV=None, n_splits=None, save_predictions_path=None):
     if CV:
-        if plot:
-            print("WARNING: Plotting Predictions is not supported when performing cross validation (CV). This will be implemented in the future.")
-        type_CV = kwargs.get('type_CV', None)
-        match type_CV:            
-            case "KFold":
-                from sklearn.model_selection import KFold
-                n_splits = kwargs.get('n_splits', None)
-                kf = KFold(n_splits=n_splits, shuffle=False)
-            case "TimeSeriesSplit":
-                from sklearn.model_selection import TimeSeriesSplit
-                n_splits = kwargs.get('n_splits', None)
-                tscv = TimeSeriesSplit(n_splits=n_splits)
-            case _:
-                raise ValueError("Please specify the type of cross validation (CV) to perform. Supported types are 'KFold' and 'TimeSeriesSplit'.")
+        from utils.evaluate_cv import nonlinearity_testing_cv
+        if save_predictions_path is not None:
+            print("WARNING: Saving predictions is not supported with cross validation (CV).")
+        return nonlinearity_testing_cv(input, output, leg_max_order, regressor, alpha, type_CV, n_splits)
+
+    clf = get_regressor(regressor, alpha)
+    keep = save_predictions_path is not None
 
     x = output
     capacity_train_list = []
     capacity_test_list = []
     R2_train_list = []
     R2_test_list = []
+    y_test_list = []
+    y_test_pred_list = []
     for n in range(1, leg_max_order+1):
         leg = legendre(n)
         y = leg(input)
-        shape_input = input.shape
-        train_size = int(shape_input[0] * (1 - test_size))
 
-        if CV:
-            cv_capacity_train_sum = 0
-            cv_capacity_test_sum = 0
-            cv_R2_train_sum = 0
-            cv_R2_test_sum = 0
-            match type_CV:
-                case "KFold":
-                    split = kf.split(x)
-                case "TimeSeriesSplit":
-                    split = tscv.split(x)
-            for i, (train_idx, test_idx) in enumerate(split):
-                # print(f"Fold {i}")
-                x_train, x_test, y_train, y_test = x[train_idx, :], x[test_idx, :], y[train_idx, :], y[test_idx, :]
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42, shuffle=False)
 
-                capacity_train, capacity_test, R2_train, R2_test = __fit__(x_train, x_test, y_train, y_test, clf, y, plot=False)
-                cv_capacity_train_sum += capacity_train
-                cv_capacity_test_sum += capacity_test
-                cv_R2_train_sum += R2_train
-                cv_R2_test_sum += R2_test
-
-            capacity_train = cv_capacity_train_sum / n_splits
-            capacity_test = cv_capacity_test_sum / n_splits
-            R2_train = cv_R2_train_sum / n_splits
-            R2_test = cv_R2_test_sum / n_splits             
-
-        else:
-            x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42, shuffle=False)
-
-            if plot:
-                print("Legendre", n)
-                capacity_train, capacity_test, R2_train, R2_test, y_train, y_train_pred, y_test, y_test_pred = __fit__(x_train, x_test, y_train, y_test, clf, y, plot=True)
-
-                plt.figure(figsize=(15, 5))
-                plt.subplot(121)
-                plt.scatter(input[:train_size, :], y_train, label='True')
-                plt.scatter(input[:train_size, :],y_train_pred, label='Predicted')
-                plt.title(f'Training Legendre {n}')
-                plt.legend()
-                plt.grid()
-
-                plt.subplot(122)
-                plt.scatter(input[train_size:, :], y_test, label='True')
-                plt.scatter(input[train_size:, :], y_test_pred, label='Predicted')
-                plt.title(f'Testing Legendre {n}')
-                plt.legend()
-                plt.grid()
-
-                plt.show()  
-            else:
-                capacity_train, capacity_test, R2_train, R2_test = __fit__(x_train, x_test, y_train, y_test, clf, y, plot=False)   
+        fit = __fit__(x_train, x_test, y_train, y_test, clf, y, return_predictions=keep)
+        capacity_train, capacity_test, R2_train, R2_test = fit[:4]
+        if keep:
+            y_test_list.append(fit[4])
+            y_test_pred_list.append(fit[5])
 
         capacity_train_list.append(capacity_train)
         capacity_test_list.append(capacity_test)
         R2_train_list.append(R2_train)
         R2_test_list.append(R2_test)
 
+    if keep:
+        save_predictions(save_predictions_path, y_test_list, y_test_pred_list, [f'leg{n}' for n in range(1, leg_max_order+1)])
+
     return capacity_train_list, capacity_test_list, R2_train_list, R2_test_list
 
-def memory_testing(input, output, max_timesteps_back, regressor, test_size, alpha, plot=False, CV=False, **kwargs):
-    if regressor == "Lin":
-        ### Linear Regression
-        clf = LinearRegression()
-    elif regressor == "Rid":
-        ### Ridge Regression
-        clf = Ridge(alpha=alpha)
-    else:
-        print("Please specify the regressor")
-
+def memory_testing(input, output, max_timesteps_back, regressor, test_size, alpha, *, CV=False, type_CV=None, n_splits=None, save_predictions_path=None):
     if CV:
-        if plot:
-            print("WARNING: Plotting Predictions is not supported when performing cross validation (CV). This will be implemented in the future.")
-        type_CV = kwargs.get('type_CV', None)
-        match type_CV:            
-            case "KFold":
-                from sklearn.model_selection import KFold
-                n_splits = kwargs.get('n_splits', None)
-                kf = KFold(n_splits=n_splits, shuffle=False)
-            case "TimeSeriesSplit":
-                from sklearn.model_selection import TimeSeriesSplit
-                n_splits = kwargs.get('n_splits', None)
-                tscv = TimeSeriesSplit(n_splits=n_splits)
-            case _:
-                raise ValueError("Please specify the type of cross validation (CV) to perform. Supported types are 'KFold' and 'TimeSeriesSplit'.")
+        from utils.evaluate_cv import memory_testing_cv
+        if save_predictions_path is not None:
+            print("WARNING: Saving predictions is not supported with cross validation (CV).")
+        return memory_testing_cv(input, output, max_timesteps_back, regressor, alpha, type_CV, n_splits)
+
+    clf = get_regressor(regressor, alpha)
+    keep = save_predictions_path is not None
 
     capacity_train_list = []
     capacity_test_list = []
     R2_train_list = []
     R2_test_list = []
+    y_test_list = []
+    y_test_pred_list = []
     for n in range(0, max_timesteps_back+1):
         x = output[n:]
         if n == 0:
@@ -184,73 +137,26 @@ def memory_testing(input, output, max_timesteps_back, regressor, test_size, alph
         else:
             y = input[:-n]
 
-        if CV:
-            cv_capacity_train_sum = 0
-            cv_capacity_test_sum = 0
-            cv_R2_train_sum = 0
-            cv_R2_test_sum = 0
-            match type_CV:
-                case "KFold":
-                    split = kf.split(x)
-                case "TimeSeriesSplit":
-                    split = tscv.split(x)
-            for i, (train_idx, test_idx) in enumerate(split):
-                # print(f"Fold {i}")
-                x_train, x_test, y_train, y_test = x[train_idx, :], x[test_idx, :], y[train_idx, :], y[test_idx, :]
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42, shuffle=False)
 
-                capacity_train, capacity_test, R2_train, R2_test = __fit__(x_train, x_test, y_train, y_test, clf, y, plot=False)
-                cv_capacity_train_sum += capacity_train
-                cv_capacity_test_sum += capacity_test
-                cv_R2_train_sum += R2_train
-                cv_R2_test_sum += R2_test
-
-            capacity_train = cv_capacity_train_sum / n_splits
-            capacity_test = cv_capacity_test_sum / n_splits
-            R2_train = cv_R2_train_sum / n_splits
-            R2_test = cv_R2_test_sum / n_splits
-
-        else:
-            x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42, shuffle=False)
-
-            if plot:
-                print("Memory", n)
-                capacity_train, capacity_test, R2_train, R2_test, y_train, y_train_pred, y_test, y_test_pred = __fit__(x_train, x_test, y_train, y_test, clf, y, plot=True)
-
-                plt.figure(figsize=(15, 5))
-                plt.subplot(121)
-                plt.scatter(y_train, y_train, label='True')
-                plt.plot(y_train_pred, label='Predicted')
-                plt.title(f'Training Memory {n}')
-                plt.legend()
-                plt.grid()
-
-                plt.subplot(122)
-                plt.plot(y_test, label='True')
-                plt.plot(y_test_pred, label='Predicted')
-                plt.title(f'Testing Memory {n}')
-                plt.legend()
-                plt.grid()
-
-                plt.show()
-            else:
-                capacity_train, capacity_test, R2_train, R2_test = __fit__(x_train, x_test, y_train, y_test, clf, y, plot=False)
+        fit = __fit__(x_train, x_test, y_train, y_test, clf, y, return_predictions=keep)
+        capacity_train, capacity_test, R2_train, R2_test = fit[:4]
+        if keep:
+            y_test_list.append(fit[4])
+            y_test_pred_list.append(fit[5])
 
         capacity_train_list.append(capacity_train)
         capacity_test_list.append(capacity_test)
         R2_train_list.append(R2_train)
         R2_test_list.append(R2_test)
 
+    if keep:
+        save_predictions(save_predictions_path, y_test_list, y_test_pred_list, [f'delay{n}' for n in range(0, max_timesteps_back+1)])
+
     return capacity_train_list, capacity_test_list, R2_train_list, R2_test_list
 
 def nonlinearity_memory_matrix(input, output, leg_max_order, max_timesteps_back, regressor, test_size, alpha):
-    if regressor == "Lin":
-        ### Linear Regression
-        clf = LinearRegression()
-    elif regressor == "Rid":
-        ### Ridge Regression
-        clf = Ridge(alpha=alpha)
-    else:
-        print("Please specify the regressor")
+    clf = get_regressor(regressor, alpha)
 
     capacity_train_matrix = np.zeros((leg_max_order, max_timesteps_back+1))
     capacity_test_matrix = np.zeros((leg_max_order, max_timesteps_back+1))
@@ -265,10 +171,10 @@ def nonlinearity_memory_matrix(input, output, leg_max_order, max_timesteps_back,
                 y = leg(input)
             else:
                 y = leg(input[:-t])
-        
+
             x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42, shuffle=False)
 
-            capacity_train, capacity_test, R2_train, R2_test = __fit__(x_train, x_test, y_train, y_test, clf, y, plot=False)
+            capacity_train, capacity_test, R2_train, R2_test = __fit__(x_train, x_test, y_train, y_test, clf, y)
 
             capacity_train_matrix[n-1, t] = capacity_train
             capacity_test_matrix[n-1, t] = capacity_test

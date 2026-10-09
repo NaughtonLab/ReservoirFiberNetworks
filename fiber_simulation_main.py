@@ -15,6 +15,7 @@ from elastica.timestepper import extend_stepper_interface
 from elastica.modules.damping import Damping
 
 from utils.forces.pointforce import PointForce, PointForceSinsusoidal, PointForceSpline
+from utils.forces.spline_input import generate_spline_inputs
 from utils.networkcallback import NetworkCallBack, NetworkCallBack_less
 from utils.render.post_processing import plot_network_video, plot_network_video_2D, plot_network_video_2D_less_callback
 
@@ -285,6 +286,13 @@ class fiber_simulation():
         else:
             print("Invalid file type!!")
 
+    def file_name(self):
+        '''Output file name without extension. utils/save_results.get_sim_name rebuilds it for the evaluation.'''
+        force_scale = {"mm_g_s": 1e6, "mm_mg_ms": 1e3}[self.scaling_type]
+        suffix = f'spacing{self.spacing:.4e}m_TF{self.tension_force/force_scale:.0e}N_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_fps{self.rendering_fps}_stepskip{self.step_skip}'
+        # name = f"{self.scaling_type}_FiberSim_{self.num_horizontal_threads+self.num_vertical_threads}rods_{suffix}"
+        return f"{self.num_horizontal_threads}by{self.num_vertical_threads}rods_{suffix}_{self.n_file}"
+
     def launch_sim(self):
 
         if self.scaling_type == "mm_g_s":
@@ -304,9 +312,7 @@ class fiber_simulation():
         else:
             raise NotImplementedError ("This unit scaling has not been implemented")
 
-        suffix = f'spacing{self.spacing:.4e}m_TF{self.tension_force/force_scale:.0e}N_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_fps{self.rendering_fps}_stepskip{self.step_skip}'
-        # name = f"{self.scaling_type}_FiberSim_{self.num_horizontal_threads+self.num_vertical_threads}rods_{suffix}"
-        name = f"{self.num_horizontal_threads}by{self.num_vertical_threads}rods_{suffix}_{self.n_file}"
+        name = self.file_name()
         print(name)
 
         self.add_threads()
@@ -345,27 +351,19 @@ class fiber_simulation():
                         ramp_up_time=ramp_up_time, hold_time=hold_time)
         elif self.TYPE_PF=="spline":
             seed_value = 1234 #int(time.time()) % (2**32-1) #
-            np.random.seed(seed_value)
-
-            sample_time = np.ceil(self.duration).astype(int)
-            x_sample = np.linspace(0, sample_time, sample_time*self.sample_freq + 1)
-
-            spline_list = []
+            # Shared with utils/extract_sim_data.py (regenerate_ip), keep the two in sync through this function
+            spline_list = generate_spline_inputs(self.duration, self.sample_freq, seed_value, n_splines=len(vib_thread_idx_list))
 
             for j in range(len(vib_thread_idx_list)):
-                y_sample = np.random.uniform(-1, 1, size=sample_time*self.sample_freq+1)
-                y_sample[0] = 0.0    
-                spline = CubicSpline(x_sample, y_sample)
+                spline = spline_list[j]
 
                 node_idx = node_idx_list[j]
                 vib_thread_idx = vib_thread_idx_list[j]
                 vib_thread = self.horizontal_thread[vib_thread_idx]
-                
+
                 for i in point_force_spread:
                     self.simulator.add_forcing_to(vib_thread).using(
                         PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i], spline=spline)
-                    
-                spline_list.append(spline)
         else:
             raise NotImplementedError ("Invalid type of point force!!")
             

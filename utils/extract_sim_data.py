@@ -1,11 +1,16 @@
 import os
 import pickle
 import numpy as np
-from scipy.interpolate import CubicSpline
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 
-def load_simulation_data(file_path, file_type, start, num_horizontal_threads, num_vertical_threads, step, regenerate_ip=False):
+from utils.forces.spline_input import generate_spline_inputs
+
+def load_simulation_data(file_path, file_type, start, num_horizontal_threads, num_vertical_threads, step, regenerate_ip=False, seed_value=1234, sample_freq=5, duration=None):
+    # seed_value, sample_freq and duration are only used when regenerate_ip=True. They must be the values
+    # the simulation ran with (simulation time units), since the input is rebuilt with the same
+    # generate_spline_inputs call as fiber_simulation_main.launch_sim. duration=None takes the last saved
+    # time rounded to the nearest integer, which removes floating point drift (e.g. 99.9999999 -> 100).
     input_data = []
     output_data = []
     time_data = []
@@ -27,7 +32,6 @@ def load_simulation_data(file_path, file_type, start, num_horizontal_threads, nu
             rods_history = data['rods_history']
             force_profile = data['force_profile']
             force_profile = force_profile.T
-            seed_value = data['seed_value']
         else:
             data_loaded = False
             raise NotImplementedError ("This unit scaling has not been implemented")
@@ -40,15 +44,9 @@ def load_simulation_data(file_path, file_type, start, num_horizontal_threads, nu
 
             if regenerate_ip:
                 print("Regenerating input data using cubic spline interpolation with seed value", seed_value)
-                seed_value = 1234
-                np.random.seed(seed_value)
-
-                duration = np.max(time)
-                sample_time = np.ceil(duration).astype(int)
-                x_sample = np.linspace(0, sample_time, sample_time*5 + 1)
-                y_sample = np.random.uniform(-1,1, size=sample_time*5+1)
-                y_sample[0] = 0.0    
-                spline = CubicSpline(x_sample, y_sample)
+                if duration is None:
+                    duration = np.rint(np.max(time))
+                spline = generate_spline_inputs(duration, sample_freq, seed_value, n_splines=1)[0]
                 ip = spline(time)
             else:
                 ip = force_profile
