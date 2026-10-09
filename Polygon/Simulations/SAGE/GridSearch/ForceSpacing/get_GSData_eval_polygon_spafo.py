@@ -1,0 +1,546 @@
+import os
+import pickle
+import numpy as np
+import pandas as pd
+from scipy.special import legendre
+from scipy.interpolate import CubicSpline
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+
+def load_simulation_data(file_path, file_type, start, step, num_sides_polygon, polygon_diameter, dx, sample_freq):
+    input_data = []
+    output_data = []
+    time_data = []
+    try:
+        if file_type == 'pickle':
+            with open(f'{file_path}.{file_type}', 'rb') as f:
+                data = pickle.load(f)
+                data_loaded = True
+
+            rods_history, force_profile = data
+            force_profile = np.array(force_profile)
+        elif file_type == 'npz':
+            npz_file = f'{file_path}.{file_type}'
+            if not os.path.exists(npz_file):
+                print('File does not exist', npz_file)
+                return [np.nan], [np.nan], [np.nan]
+            data = np.load(f'{file_path}.{file_type}', allow_pickle=True)
+            data_loaded = True
+            rods_history = data['rods_history'][0]
+            # force_profile = data['force_profile']
+            # force_profile = force_profile.T
+            # seed_value = data['seed_value']
+        else:
+            data_loaded = False
+            raise NotImplementedError ("This unit scaling has not been implemented")
+        if data_loaded:
+            print(f"Data loaded successfully for file {file_path}")
+
+            time = np.array(rods_history[0]["time"])
+            stop = len(time)
+
+            seed_value = 1234
+            np.random.seed(seed_value)
+
+            duration = np.max(time)
+            sample_time = np.ceil(duration).astype(int)
+            x_sample = np.linspace(0, sample_time, sample_time*sample_freq + 1)
+            y_sample = np.random.uniform(-1,1, size=sample_time*sample_freq+1)
+            y_sample[0] = 0.0    
+            spline = CubicSpline(x_sample, y_sample)
+            ip = spline(time)
+
+            t = time[start:stop:step]
+            ip = ip[start:stop:step]
+            op = preprocess_rod_data(rods_history, num_sides_polygon, polygon_diameter, dx)
+            op = op[start:stop:step]
+
+            input_data.append(ip)
+            output_data.append(op)
+            time_data.append(t)
+    except Exception as e:
+        print(f"Error loading file: {e}")
+    return input_data, output_data, time_data
+
+def preprocess_rod_data(rods_history, num_sides_polygon, polygon_diameter, dx):
+    num_radial_threads = np.rint(num_sides_polygon/2).astype(int)
+    num_diagonal_threads = num_sides_polygon
+
+    rod_pos = []
+    for i in range(num_radial_threads + num_diagonal_threads):
+        rod_pos.append(np.array(rods_history[i]["position"]))
+
+    n_elem_radial = rod_pos[0].shape[2]-1
+    n_elem_diagonal = rod_pos[num_radial_threads].shape[2]-1
+
+    rad_rad_connect_idx = np.rint(n_elem_radial/2).astype(int)
+    rad_to_diag_connect_distance_from_center = 0.5 * polygon_diameter * np.cos(2 * np.pi / num_sides_polygon)
+    rad_to_diag_connect_idx_near_start = np.rint((0.5 * polygon_diameter - rad_to_diag_connect_distance_from_center)/dx).astype(int)
+    rad_to_diag_connect_idx_near_end = np.rint((0.5 * polygon_diameter + rad_to_diag_connect_distance_from_center)/dx).astype(int)
+
+    diagonal_length = polygon_diameter * np.sin(2 * np.pi / num_sides_polygon)
+    diag_to_rad_connect_distance = 0.5 * diagonal_length
+    diag_to_rad_connect_idx = np.rint(diag_to_rad_connect_distance/dx).astype(int)
+    
+    diag_diag_connect_distance = 0.5 * polygon_diameter * np.tan(np.pi/num_sides_polygon)
+    diag_diag_connect_idx_near_start = np.rint((diag_diag_connect_distance)/dx).astype(int)
+    diag_diag_connect_idx_near_end = np.rint((diagonal_length - diag_diag_connect_distance)/dx).astype(int)
+
+    num_connection_nodes = 2 * num_sides_polygon + 1
+    connection_nodes = []
+
+    # Get position of all connections for each radial thread
+    for i in range(num_radial_threads):
+        if i == 0:
+            connection_nodes.append(rod_pos[i][..., int(rad_rad_connect_idx)][..., 0:2])
+        connection_nodes.append(rod_pos[i][..., int(rad_to_diag_connect_idx_near_start)][..., 0:2])
+        connection_nodes.append(rod_pos[i][..., int(rad_to_diag_connect_idx_near_end)][..., 0:2])
+    
+    # Get position of all connections for each diagonal thread except the ones with radial as we've already got those from above loop
+    for i in range(0, num_diagonal_threads, 2):
+        j = i + num_radial_threads
+        connection_nodes.append(rod_pos[j][..., int(diag_diag_connect_idx_near_start)][..., 0:2])
+        connection_nodes.append(rod_pos[j][..., int(diag_diag_connect_idx_near_end)][..., 0:2])
+
+    connection_nodes = np.hstack([connection_nodes[i] for i in range(len(connection_nodes))])
+
+    num_segments_per_thread = 4
+
+    rad_midpoints = num_segments_per_thread * num_radial_threads
+    rad_conn_idx = [rad_to_diag_connect_idx_near_start, rad_rad_connect_idx, rad_to_diag_connect_idx_near_end]
+
+    diag_midpoints = num_segments_per_thread * num_diagonal_threads
+    diag_conn_idx = [diag_diag_connect_idx_near_start, diag_to_rad_connect_idx, diag_diag_connect_idx_near_end]
+
+    num_segment_midpoints = rad_midpoints + diag_midpoints
+    segment_midpoints = []
+
+    # Getting position of segment midpoints for radial threads
+    for i in range(num_radial_threads):
+        start_node_idx = 0
+        end_node_idx = n_elem_radial + 1
+        for j in range(num_segments_per_thread):
+            if j < len(rad_conn_idx):
+                midpoint_node_idx = (start_node_idx + rad_conn_idx[j])/2
+                start_node_idx = rad_conn_idx[j]
+            else:
+                midpoint_node_idx = (rad_conn_idx[-1] + end_node_idx)/2
+            midpoint_node_idx = int(midpoint_node_idx)
+            current_midpoint = rod_pos[i][..., midpoint_node_idx][..., 0:2]
+            segment_midpoints.append(current_midpoint)
+            
+    # Getting position of segment midpoints for diagonal threads
+    for i in range(num_radial_threads, num_radial_threads + num_diagonal_threads):
+        start_node_idx = 0
+        end_node_idx = n_elem_diagonal + 1
+        for j in range(num_segments_per_thread):
+            if j < len(diag_conn_idx):
+                midpoint_node_idx = (start_node_idx + diag_conn_idx[j])/2
+                start_node_idx = diag_conn_idx[j]
+            else:
+                midpoint_node_idx = (diag_conn_idx[-1] + end_node_idx)/2
+            midpoint_node_idx = int(midpoint_node_idx)
+            current_midpoint = rod_pos[i][..., midpoint_node_idx][..., 0:2]
+            segment_midpoints.append(current_midpoint)
+
+    segment_midpoints = np.hstack([segment_midpoints[i] for i in range(len(segment_midpoints))])
+    num_outputs = num_connection_nodes + num_segment_midpoints
+    output = np.hstack([connection_nodes, segment_midpoints])
+
+    # # WHY DO THIS IF WE ARE GOING TO USE STANDARDSCALER LATER??
+    # output /= np.mean(output, axis=0) # mean is calculated along the rows i.e., the number of columns stay the same
+    # output /= np.std(output, axis=0)
+    op = output
+
+    # scaler = preprocessing.StandardScaler().fit(output)
+    # op = scaler.transform(output)
+
+    return op
+
+def nonlinearity_testing(input, output, leg_max_order, regressor, test_size, alpha):
+    if regressor == "Lin":
+        ### Linear Regression
+        clf = LinearRegression()
+    elif regressor == "Rid":
+        ### Ridge Regression
+        clf = Ridge(alpha=alpha)
+    else:
+        print("Please specify the regressor")
+
+    x = output
+    capacity_train_list = []
+    capacity_test_list = []
+    R2_train_list = []
+    R2_test_list = []
+    for n in range(1, leg_max_order+1):
+        leg = legendre(n)
+        y = leg(input)
+        shape_input = input.shape
+        train_size = int(shape_input[0] * (1 - test_size))
+        y2 = (1/len(y)) * np.sum((y-np.mean(y))**2)
+
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42, shuffle=False)
+        
+        # Training
+        clf.fit(x_train, y_train)
+        y_train_pred = clf.predict(x_train)
+
+        idx = np.where(abs(y_train_pred) > 1)
+        y_train_pred[idx] = np.mean(y)
+        y_train[idx] = np.mean(y)
+
+        # Testing
+        y_test_pred = clf.predict(x_test)
+
+        idx = np.where(abs(y_test_pred) > 1)
+        y_test_pred[idx] = np.mean(y)
+        y_test[idx] = np.mean(y)
+
+        y2_train = (1/len(y_train)) * np.sum((y_train-np.mean(y_train))**2)
+
+        MSE = mean_squared_error(y_true=y_train, y_pred=y_train_pred)
+        capacity_train = 1 - MSE/y2_train
+        R2_train = r2_score(y_true=y_train, y_pred=y_train_pred)
+
+        y2_test = (1/len(y_test)) * np.sum((y_test-np.mean(y_test))**2)
+
+        MSE = mean_squared_error(y_true=y_test, y_pred=y_test_pred)
+        capacity_test = 1 - MSE/y2_test
+        R2_test = r2_score(y_true=y_test, y_pred=y_test_pred)
+
+        if R2_test < 0:
+            R2_test = 0
+        if R2_train < 0:
+            R2_train = 0
+        if capacity_test < 0:
+            capacity_test = 0
+        if capacity_train < 0:
+            capacity_train = 0
+
+        # print("legendre", n, "MSE", MSE_train, MSE_test, "y2", y2, "capacity", capacity_train, capacity_test)
+
+        # plt.figure(figsize=(15, 5))
+        # plt.subplot(121)
+        # plt.scatter(input[:train_size, :], y_train, label='True')
+        # plt.scatter(input[:train_size, :],y_train_pred, label='Predicted')
+        # plt.title(f'Training Legendre {n}')
+        # plt.legend()
+        # plt.grid()
+
+        # plt.subplot(122)
+        # plt.scatter(input[train_size:, :], y_test, label='True')
+        # plt.scatter(input[train_size:, :], y_test_pred, label='Predicted')
+        # plt.title(f'Testing Legendre {n}')
+        # plt.legend()
+        # plt.grid()
+
+        # plt.show()     
+
+        capacity_train_list.append(capacity_train)
+        capacity_test_list.append(capacity_test)
+        R2_train_list.append(R2_train)
+        R2_test_list.append(R2_test)
+
+    return capacity_train_list, capacity_test_list, R2_train_list, R2_test_list
+
+def memory_testing(input, output, max_timesteps_back, regressor, test_size, alpha):
+    if regressor == "Lin":
+        ### Linear Regression
+        clf = LinearRegression()
+    elif regressor == "Rid":
+        ### Ridge Regression
+        clf = Ridge(alpha=alpha)
+    else:
+        print("Please specify the regressor")
+
+    capacity_train_list = []
+    capacity_test_list = []
+    R2_train_list = []
+    R2_test_list = []
+    for n in range(0, max_timesteps_back+1):
+        x = output[n:]
+        if n == 0:
+            y = input
+        else:
+            y = input[:-n]
+
+        y2 = (1/len(y)) * np.sum((y-np.mean(y))**2)
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42, shuffle=False)
+        
+        # Training
+        clf.fit(x_train, y_train)
+        y_train_pred = clf.predict(x_train)
+
+        idx = np.where(abs(y_train_pred) > 1)
+        y_train_pred[idx] = np.mean(y)
+        y_train[idx] = np.mean(y)
+
+        # Testing
+        y_test_pred = clf.predict(x_test)
+
+        idx = np.where(abs(y_test_pred) > 1)
+        y_test_pred[idx] = np.mean(y)
+        y_test[idx] = np.mean(y)
+
+        y2_train = (1/len(y_train)) * np.sum((y_train-np.mean(y_train))**2)
+
+        MSE = mean_squared_error(y_true=y_train, y_pred=y_train_pred)
+        capacity_train = 1 - MSE/y2_train
+        R2_train = r2_score(y_true=y_train, y_pred=y_train_pred)
+
+        y2_test = (1/len(y_test)) * np.sum((y_test-np.mean(y_test))**2)
+
+        MSE = mean_squared_error(y_true=y_test, y_pred=y_test_pred)
+        capacity_test = 1 - MSE/y2_test
+        R2_test = r2_score(y_true=y_test, y_pred=y_test_pred)
+
+        if R2_test < 0:
+            R2_test = 0
+        if R2_train < 0:
+            R2_train = 0
+        if capacity_test < 0:
+            capacity_test = 0
+        if capacity_train < 0:
+            capacity_train = 0
+
+        # plt.figure(figsize=(15, 5))
+        # plt.subplot(121)
+        # plt.scatter(y_train, y_train, label='True')
+        # plt.plot(y_train_pred, label='Predicted')
+        # plt.title(f'Training Memory {n}')
+        # plt.legend()
+        # plt.grid()
+
+        # plt.subplot(122)
+        # plt.plot(y_test, label='True')
+        # plt.plot(y_test_pred, label='Predicted')
+        # plt.title(f'Testing Memory {n}')
+        # plt.legend()
+        # plt.grid()
+
+        # plt.show()
+
+        capacity_train_list.append(capacity_train)
+        capacity_test_list.append(capacity_test)
+        R2_train_list.append(R2_train)
+        R2_test_list.append(R2_test)
+
+        # print("memory", n, R2_train, R2_test, capacity_train, capacity_test)
+
+    return capacity_train_list, capacity_test_list, R2_train_list, R2_test_list
+
+def nonlinearity_memory_matrix(input, output, leg_max_order, max_timesteps_back, regressor, test_size, alpha):
+    if regressor == "Lin":
+        ### Linear Regression
+        clf = LinearRegression()
+    elif regressor == "Rid":
+        ### Ridge Regression
+        clf = Ridge(alpha=alpha)
+    else:
+        print("Please specify the regressor")
+
+    capacity_train_matrix = np.zeros((leg_max_order, max_timesteps_back+1))
+    capacity_test_matrix = np.zeros((leg_max_order, max_timesteps_back+1))
+    R2_train_matrix = np.zeros((leg_max_order, max_timesteps_back+1))
+    R2_test_matrix = np.zeros((leg_max_order, max_timesteps_back+1))
+
+    for n in range(1, leg_max_order+1):
+        leg = legendre(n)
+        for t in range(max_timesteps_back+1):
+            x = output[t:]
+            if t == 0:
+                y = leg(input)
+            else:
+                y = leg(input[:-t])
+
+            y2 = (1/len(y)) * np.sum((y-np.mean(y))**2)
+        
+            x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42, shuffle=False)
+            
+            # Training
+            clf.fit(x_train, y_train)
+            y_train_pred = clf.predict(x_train)
+
+            idx = np.where(abs(y_train_pred) > 1)
+            y_train_pred[idx] = np.mean(y)
+            y_train[idx] = np.mean(y)
+
+            # Testing
+            y_test_pred = clf.predict(x_test)
+
+            idx = np.where(abs(y_test_pred) > 1)
+            y_test_pred[idx] = np.mean(y)
+            y_test[idx] = np.mean(y)
+
+            y2_train = (1/len(y_train)) * np.sum((y_train-np.mean(y_train))**2)
+
+            MSE = mean_squared_error(y_true=y_train, y_pred=y_train_pred)
+            capacity_train = 1 - MSE/y2_train
+            R2_train = r2_score(y_true=y_train, y_pred=y_train_pred)
+
+            y2_test = (1/len(y_test)) * np.sum((y_test-np.mean(y_test))**2)
+
+            MSE = mean_squared_error(y_true=y_test, y_pred=y_test_pred)
+            capacity_test = 1 - MSE/y2_test
+            R2_test = r2_score(y_true=y_test, y_pred=y_test_pred)
+
+            if R2_test < 0:
+                R2_test = 0
+            if R2_train < 0:
+                R2_train = 0
+            if capacity_test < 0:
+                capacity_test = 0
+            if capacity_train < 0:
+                capacity_train = 0
+
+            capacity_train_matrix[n-1, t] = capacity_train
+            capacity_test_matrix[n-1, t] = capacity_test
+            R2_train_matrix[n-1, t] = R2_train
+            R2_test_matrix[n-1, t] = R2_test
+
+    return capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix
+
+if __name__ == '__main__':
+
+    start = 0
+    step = 1
+    step_skip = 800
+    fps = 250
+    folder = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(folder, 'Data', '')
+
+    csv_name = os.path.join(folder, 'GSPolyForceSpacingFine')
+
+    grid_1 = np.load(os.path.join(folder, 'force_spacing_grid_new.npz'), allow_pickle=True)
+    grid_1 = grid_1['grid']
+
+    grid_2 = np.load(os.path.join(folder, 'force_spacing_grid_new_2.npz'), allow_pickle=True)
+    grid_2 = grid_2['grid']
+
+    idx_list = [i for i in range(224, 252)]
+
+    # if idx_list[0] == 0:
+    #     df = pd.DataFrame(columns = ['num_sides_polygon', 'spacing(mm)', 'diameter(mm)', 'force_mag(N)', 'nonlinearity', 'memory'])
+    # else:
+    #     df = pd.read_csv(f"{csv_name}.csv")
+
+    regressor = "Rid"
+    test_size = 0.5
+    alpha = 1e-2
+
+    num_sides_polygon = 6
+    sample_freq = 5
+    TYPE_PF = 'spline'
+
+    for idx in idx_list:
+        if idx < 112:
+            grid = grid_1
+            idx_temp = idx
+        else:
+            grid = grid_2
+            idx_temp = idx - 112
+
+        grid_data = grid[idx_temp]
+        point_force_mag = grid_data[0]
+        spacing = grid_data[1]*1e-3
+        if idx >= 112:
+            spacing *= 1e3
+        radius = spacing / np.cos( 2 * np.pi / num_sides_polygon)
+        polygon_diameter = 2 * radius
+
+        dx = 10e-3
+        n_elem = np.rint(polygon_diameter/dx).astype(int)
+        if n_elem < 50:
+            n_elem = 50
+            dx = polygon_diameter/n_elem
+
+        if dx > 10e-3:
+            dx = 10e-3
+            n_elem = np.rint(polygon_diameter/dx).astype(int)
+
+        suffix = f'spacing{spacing/1e3:.4e}m_PF{-point_force_mag:.0e}N{TYPE_PF}_{sample_freq}Hz_fps{fps}_stepskip{step_skip}'
+        sim_name = f"Polygon{num_sides_polygon}_{suffix}_{idx}"
+
+        sim_ip_data, sim_op_data, sim_time_data = load_simulation_data(file_path = f"{path}{sim_name}", 
+                                                                        file_type = 'npz',
+                                                                        start = 0, step = step, 
+                                                                        num_sides_polygon = num_sides_polygon, 
+                                                                        polygon_diameter = polygon_diameter, 
+                                                                        dx = dx, 
+                                                                        sample_freq = sample_freq)
+
+        ### Evaluation
+        input_data = sim_ip_data[0]
+        output_data = sim_op_data[0]
+        time_data = sim_time_data[0]
+
+        # data = np.load(f"{path}{idx}_eval.npz", allow_pickle=True)
+        # input_data = data['input_data']
+        # # output_data = data['output_data']
+        # # time_data = data['time_data']
+        # leg_R2_test_list = data['nonlinearity'][3]
+        # mem_R2_test_list = data['memory'][3]
+
+        if not np.isnan(input_data).any():
+            print(idx)
+
+            input_data = -1 + (input_data - np.min(input_data)) / (np.max(input_data) - np.min(input_data)) * (1 - (-1))
+
+            print(input_data.shape, output_data.shape)
+
+            op = output_data / np.mean(output_data, axis=0)
+            op /= np.std(op, axis=0)
+
+            # Nonlinearity testing
+            leg_max_order = 10
+            leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list = nonlinearity_testing(input_data, op, leg_max_order, regressor, test_size, alpha)
+            
+            # Memory testing
+            max_time_back_seconds = 1
+            max_timesteps_back = np.rint(fps*max_time_back_seconds).astype(int)
+            mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list = memory_testing(input_data, op, max_timesteps_back, regressor, test_size, alpha)
+
+            # Nonlinearity-Memory matrix
+            capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix = nonlinearity_memory_matrix(input_data, output_data, leg_max_order, max_timesteps_back, regressor, test_size, alpha)
+
+            onc = sum(leg_R2_test_list)/len(leg_R2_test_list)
+            omc = sum(mem_R2_test_list)/len(mem_R2_test_list)
+
+            print(onc, omc)
+            
+        else:
+            leg_capacity_train_list = np.nan
+            leg_R2_train_list = np.nan
+            mem_capacity_train_list = np.nan
+            mem_R2_train_list = np.nan
+            capacity_train_matrix = np.nan
+            R2_train_matrix = np.nan
+            leg_capacity_test_list = np.nan
+            leg_R2_test_list = np.nan
+            mem_capacity_test_list = np.nan
+            mem_R2_test_list = np.nan
+            capacity_test_matrix = np.nan
+            R2_test_matrix = np.nan
+            onc = np.nan
+            omc = np.nan
+
+        # Save results in dataframe
+        # df.at[idx, 'num_sides_polygon'] = num_sides_polygon
+        # df.at[idx, 'spacing(mm)'] = spacing*1e3
+        # df.at[idx, 'diameter(mm)'] = polygon_diameter*1e3
+        # df.at[idx, 'force_mag(N)'] = point_force_mag
+        # df.at[idx, 'nonlinearity'] = onc
+        # df.at[idx, 'memory'] = omc
+
+        np.savez(f"{path}{idx}_eval.npz", input_data=input_data, 
+                output_data=output_data, 
+                time_data=time_data, 
+                nonlinearity=[leg_capacity_train_list, leg_capacity_test_list, leg_R2_train_list, leg_R2_test_list], 
+                memory=[mem_capacity_train_list, mem_capacity_test_list, mem_R2_train_list, mem_R2_test_list], 
+                heatmap=[capacity_train_matrix, capacity_test_matrix, R2_train_matrix, R2_test_matrix])
+        
+        print(idx, "eval done.")
+
+    # df.to_csv(f"{csv_name}.csv", index=False)
