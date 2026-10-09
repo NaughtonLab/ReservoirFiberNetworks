@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     parent_folder = "Simulations/SAGE/ForceCliff"
 
-    sweep = np.load(f'{parent_folder}/forces_sweep_corrected.npz', allow_pickle=True)
+    sweep = np.load(f'{parent_folder}/forces_sweep.npz', allow_pickle=True)
     sweep = sweep['sweep']
 
     parser = argparse.ArgumentParser(description="Script that configures and launches fiber_simulation for a sweep of point forces to investigate the cliff in heatmap")
