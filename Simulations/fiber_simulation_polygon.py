@@ -16,7 +16,7 @@ from elastica.modules.damping import Damping
 
 from utils.forces.pointforce import PointForce, PointForceSinsusoidal, PointForceSpline, PointForceImpulse
 from utils.networkcallback import NetworkCallBack
-from utils.render.post_processing import plot_network_video, plot_network_video_2D, plot_network_video_2D_less_callback
+from utils.render.post_processing import plot_network_video, plot_network_video_2D
 
 from tqdm import tqdm
 
@@ -38,7 +38,6 @@ class fiber_simulation():
         thread_diameter = kwargs.get("thread_diameter", 4e-3 * 1e3) # m --> 1e3 mm (1e3)
         self.thread_radius = 0.5 * thread_diameter
         self.dx = kwargs.get("dx", 20) # m --> 1e3 mm (1e3)
-        self.spacing = kwargs.get("spacing", 1234)
 
         '''Young's modulus'''
         self.youngs_modulus = kwargs.get("youngs_modulus", 230e6) # Pa (N/m2) => kg / m / s2 --> 1e3 g / 1e3 mm / s2 (1.0) --> 1e6 mg / 1e3 mm / 1e6 ms2 (1e-3)
@@ -99,15 +98,15 @@ class fiber_simulation():
         """RADIAL THREADS"""
         self.radial_threads = [None for i in range(int(self.num_sides_polygon/2))] #int(self.num_sides_polygon/2)
         self.n_elem_radial = np.rint(self.polygon_diameter/self.dx).astype(int)
-        # print(f"Number of elements in radial threads: {self.n_elem_radial}")
+        print(f"Number of elements in radial threads: {self.n_elem_radial}")
         ang_between_radial_threads = 2 * np.pi / self.num_sides_polygon
 
         self.rad_rad_connect_idx = np.rint(self.n_elem_radial/2).astype(int)
         rad_to_diag_connect_distance_from_center = 0.5 * self.polygon_diameter * np.cos(2 * np.pi / self.num_sides_polygon)
         self.rad_to_diag_connect_idx_near_start = np.rint((0.5*self.polygon_diameter - rad_to_diag_connect_distance_from_center)/self.dx).astype(int)
         self.rad_to_diag_connect_idx_near_end = np.rint((0.5*self.polygon_diameter + rad_to_diag_connect_distance_from_center)/self.dx).astype(int)
-        # print(f"Index of connection between radial threads: {self.rad_rad_connect_idx}")
-        # print(f"Index of connection between radial and diagonal threads: {self.rad_to_diag_connect_idx_near_start}, {self.rad_to_diag_connect_idx_near_end}")
+        print(f"Index of connection between radial threads: {self.rad_rad_connect_idx}")
+        print(f"Index of connection between radial and diagonal threads: {self.rad_to_diag_connect_idx_near_start}, {self.rad_to_diag_connect_idx_near_end}")
 
         def _vertices(num_sides, diameter, origin, ang_between_radial_threads):
             vertices = []
@@ -398,10 +397,11 @@ class fiber_simulation():
         else:
             raise NotImplementedError ("This unit scaling has not been implemented")
 
-        suffix = f'spacing{self.spacing/length_scale:.4e}m_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_{self.sample_freq}Hz_fps{self.rendering_fps}_stepskip{self.step_skip}'
+        # suffix = f'{self.duration/time_scale:.0f}sec_L{self.polygon_diameter/length_scale:.2e}m_R{self.thread_radius/length_scale:.2e}m_dx{self.dx:.0f}mm_YM{self.youngs_modulus/modulus_scale:.2e}Pa_Density{self.density/density_scale:.2e}kgmm-3_Damping{self.damping_constant:.0f}_TF{self.tension_force/force_scale:.0e}N_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_k{self.k:.0e}_kt{self.kt:.0e}_fps{self.rendering_fps}_stepskip{self.step_skip}'
         # # name = f"{self.scaling_type}_FiberSim_{self.num_horizontal_threads+self.num_vertical_threads}rods_{suffix}"
         # name = f"diffconstraints_{self.scaling_type}_FiberSim_{self.num_sides_polygon}rods_{suffix}_{self.n_file}"
-        name = f"Polygon{self.num_sides_polygon}_{suffix}_{self.n_file}"
+        name = f"Polygon{self.num_sides_polygon}_PF{self.point_force_mag/force_scale:.0e}N{self.TYPE_PF}_{self.sample_freq}Hz_{self.n_file}"
+        print(name)
 
         self.add_threads()
 
@@ -445,6 +445,7 @@ class fiber_simulation():
                         PointForceSinsusoidal, node_idx=node_idx+i, point_force=point_force*stencil[i],
                         ramp_up_time=ramp_up_time, hold_time=hold_time)
         elif self.TYPE_PF=="spline":
+            ramp_up_time = 1.0 * time_scale
             seed_value = 1234 #int(time.time()) % (2**32-1)
             np.random.seed(seed_value)
 
@@ -464,7 +465,8 @@ class fiber_simulation():
                 
                 for i in point_force_spread:
                     self.simulator.add_forcing_to(vib_thread).using(
-                        PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i], spline=spline)
+                        PointForceSpline, node_idx=node_idx+i, point_force=point_force*stencil[i],
+                        ramp_up_time=ramp_up_time, spline=spline)
                     
                 spline_list.append(spline)
         elif self.TYPE_PF=="impulse":
@@ -493,8 +495,7 @@ class fiber_simulation():
 
         do_step, stages_and_updates = extend_stepper_interface(self.StatefulStepper, self.simulator)
 
-        # for i in tqdm(range(n_steps)):
-        for i in range(n_steps):
+        for i in tqdm(range(n_steps)):
             current_time = do_step(self.StatefulStepper, stages_and_updates, self.simulator, current_time, self.sim_dt)
 
             for j in range(len(self.radial_threads)):
@@ -540,7 +541,7 @@ class fiber_simulation():
                 x_limits = [-self.polygon_diameter/2-5, self.polygon_diameter/2+5]
                 y_limits = [-self.polygon_diameter/2-5, self.polygon_diameter/2+5]
                 params_str =  f"Young's Modulus = {self.youngs_modulus/modulus_scale:.2e}Pa, Point Force = {self.point_force_mag/force_scale:.0e}N, Tension Force = {self.tension_force/force_scale:.0e}N"
-                plot_network_video_2D_less_callback(
+                plot_network_video_2D(
                     rods_history,
                     video_name=f"{self.loc}{name}.mp4",
                     fps=self.rendering_fps,

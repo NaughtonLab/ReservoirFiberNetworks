@@ -22,7 +22,7 @@ def mp_handler(params_list):
 
 if __name__ == '__main__':
     
-    parent_folder = "Simulations/SAGE/GridSearch/ForceSpacing"
+    parent_folder = "./Simulations/SAGE/GridSearch/ForceSpacing"
 
     parser = argparse.ArgumentParser(description="Script that configures and launches fiber_simulation")
 
@@ -42,7 +42,10 @@ if __name__ == '__main__':
     data = grid[grid_idx_new]
     
     point_force_mag = data[0]
-    spacing = data[1]
+    spacing = data[1]*1e-3
+
+    if grid_idx >= 112:
+        spacing *= 1e3
 
     num_sides_polygon = 6
     radius = spacing / np.cos( 2 * np.pi / num_sides_polygon)
